@@ -51,7 +51,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.request = {
-      url: 'api/status',
+      url: 'users/1',
       method: 'GET',
       options: new RequestOptions()
     };

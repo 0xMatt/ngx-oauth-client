@@ -6,6 +6,6 @@
 export const environment = {
   production: false,
   api: {
-    host: 'http://javelet.net:8080'
+    host: 'https://jsonplaceholder.typicode.com'
   }
 };
