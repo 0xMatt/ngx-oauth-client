@@ -1,0 +1,20 @@
+language: node_js
+node_js:
+  - "stable"
+
+before_install:
+- npm install -g npm@latest
+
+script:
+- npm install
+- npm run test-coverage
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    # required by node-gyp to build some packages
+    packages:
+    - g++-4.8
+
+after_success: 'npm run coveralls'

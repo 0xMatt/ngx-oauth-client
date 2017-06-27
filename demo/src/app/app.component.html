@@ -1,0 +1,117 @@
+<div class="alert alert-info">
+    This http client demo is configured with url <a href="{{environment.api.host}}">{{environment.api.host}}</a>, please take a look here for all available resources.
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="pull-right">{{environment.api.host}}</span>
+        Perform a Request
+    </div>
+    <div class="panel-body">
+        <form #form="ngForm" (ngSubmit)="sendRequest(request)">
+            <label for="basic-url">URL</label>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">{{request.method}} <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li *ngFor="let method of methods" (click)="selectMethod(method)"><a href="#">{{method}}</a>
+                        </li>
+                    </ul>
+                </div><!-- /btn-group -->
+                <input type="text" class="form-control" aria-label="..." [(ngModel)]="request.url" name="url" required>
+            </div><!-- /input-group -->
+            <br>
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#headers" aria-controls="home" role="tab" data-toggle="tab">Headers</a>
+                </li>
+                <li role="presentation">
+                    <a href="#request" aria-controls="profile" role="tab" data-toggle="tab">Body</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="headers" data-toggle="tab">
+                    <h4>Headers</h4>
+                    <div class="row" *ngFor="let header of headers; let index = index;">
+                        <div class="col-xs-5">
+                            <input type="text" class="form-control" placeholder="Key" [(ngModel)]="headers[index].key"
+                                   name="header_k{{index}}">
+                        </div>
+                        <div class="col-xs-5">
+                            <input type="text" class="form-control" placeholder="Value"
+                                   [(ngModel)]="headers[index].value" name="header_v{{index}}">
+                        </div>
+                        <div class="col-xs-2" *ngIf="index === 0" (click)="addHeader('', '')">
+                            <button class="btn btn-success">
+                                <i class="glyphicon glyphicon-plus"></i>
+                            </button>
+                        </div>
+                        <div class="col-xs-2" *ngIf="index > 0">
+                            <button class="btn btn-success" (click)="removeHeader(index)">
+                                <i class="glyphicon glyphicon-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="request" data-toggle="tab">
+                    <textarea class="form-control" name="body" [(ngModel)]="request.data"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block" [disabled]="form.valid === false">Send
+                    Requests
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="panel panel-default" *ngIf="response" id="response">
+    <div class="panel-heading">
+        <span class="pull-right">{{response.url}}</span>
+        <span [ngStyle]="{color: response.ok ? 'green' : 'red'}">Response Status: {{response.status}}</span>
+    </div>
+    <div class="panel-body">
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#body" aria-controls="body" role="tab" data-toggle="tab">Body</a>
+            </li>
+            <li role="presentation">
+                <a href="#rheaders" aria-controls="rheaders" role="tab" data-toggle="tab">Headers</a>
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="body" data-toggle="tab">
+                <h4>Body</h4>
+                <pre>{{response.json()|json}}</pre>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="rheaders" data-toggle="tab">
+                <h4>Headers</h4>
+                <pre>{{response.headers|json}}</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-container *ngIf="environment.production === false">
+    <h3>DEBUG</h3>
+    <div class="row">
+        <div class="col-sm-6">
+            <h4>Request</h4>
+            <pre>{{request|json}}</pre>
+        </div>
+        <div class="col-sm-6">
+            <ng-container *ngIf="response">
+                <h4>Response</h4>
+                <pre>{{response|json}}</pre>
+            </ng-container>
+        </div>
+    </div>
+</ng-container>
