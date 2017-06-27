@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>NgxOauthClient</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+  <link rel="icon"
+        type="image/x-icon"
+        href="favicon.ico">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+        rel="stylesheet">
+<link href="styles.2a8757c0ab45498e2d43.bundle.css" rel="stylesheet"/></head>
+<body>
+
+<header class="main-header">
+  <a href="https://github.com/0xMatt/ngx-oauth-client"
+     class="fork-me-badge">
+    <img src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67"
+         alt="Fork me on GitHub"
+         data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png">
+  </a>
+
+  <div class="container">
+    <h1 class="header">ngx-oauth-client</h1>
+
+    <!-- Place this tag where you want the button to render. -->
+    <!-- Place this tag where you want the button to render. -->
+    <a class="github-button"
+       href="https://github.com/0xMatt/ngx-oauth-client"
+       data-icon="octicon-star"
+       data-size="large"
+       data-show-count="true"
+       aria-label="Star 0xMatt/ngx-oauth-client on GitHub">Star</a>
+
+    <!-- Place this tag where you want the button to render. -->
+    <a class="github-button"
+       href="https://github.com/0xMatt/ngx-oauth-client/fork"
+       data-icon="octicon-repo-forked"
+       data-size="large"
+       data-show-count="true"
+       aria-label="Fork 0xMatt/ngx-oauth-client on GitHub">Fork</a>
+
+    <!-- Place this tag where you want the button to render. -->
+    <a class="github-button"
+       href="https://github.com/0xMatt/ngx-oauth-client/issues"
+       data-icon="octicon-issue-opened"
+       data-size="large"
+       data-show-count="true"
+       aria-label="Issue 0xMatt/ngx-oauth-client on GitHub">Issue</a>
+  </div>
+</header>
+
+<div class="container">
+  <main>
+    <p><a href="https://badge.fury.io/js/ngx-oauth-client"><img src="https://badge.fury.io/js/ngx-oauth-client.svg" alt="npm version"></a>
+<a href="https://travis-ci.org/0xMatt/ngx-oauth-client?branch=master"><img src="https://travis-ci.org/0xMatt/ngx-oauth-client.svg" alt="Build Status"></a>
+<a href="https://coveralls.io/github/0xMatt/ngx-oauth-client?branch=master"><img src="https://coveralls.io/repos/github/0xMatt/ngx-oauth-client/badge.svg?branch=master" alt="Coverage Status"></a></p>
+<h1 id="ngx-oauth-client">ngx-oauth-client</h1>
+<p><em>ngx-oauth-client</em> is an Angular2/4 HTTP/OAuth2 client. This package allows you to set up multiple clients to interface with many OAuth2 compliant APIs.</p>
+<p>Check out the <a href="http://0xMatt.github.io/ngx-oauth-client/#demo">demo</a>!</p>
+<p><a href="https://github.com/0xMatt/ngx-oauth-client/issues">Bug-reports or feature request</a> are welcome!</p>
+<h2 id="getting-started">Getting started</h2>
+<p>Install it via npm:</p>
+<pre><code>npm install ngx-oauth-client -S
+</code></pre><p>And add it as a dependency to your main module</p>
+<pre><code class="lang-typescript">import {NgxOAuthModule} from &#39;ngx-oauth-client&#39;;
+@NgModule({
+  imports: [
+    NgxOAuthModule
+  ],
+})
+export class AppModule {
+}
+</code></pre>
+<p>Using the library is easy, just create your extending class and configure it:</p>
+<pre><code class="lang-typescript">import {NgxOAuthClient, DefaultHeaders, Configuration} from &#39;ngx-oauth-client&#39;;
+@Configuration({
+  host: &#39;https://jsonplaceholder.typicode.com&#39;
+})
+@DefaultHeaders({
+  &#39;Content-Type&#39;: &#39;application/json&#39;,
+  &#39;Accept&#39;: &#39;application/json&#39;
+})
+export class MyApiClient extends NgxOAuthClient {
+    responseIntereptor(response: Response) {
+      return response.json();
+    }
+}
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>Configuration is done via the Configuration decorator, the api is simple</p>
+<pre><code class="lang-typescript">interface NgxOAuthConfig {
+  host: string;
+  token?: string;
+  key?: string;
+  secret?: string;
+}
+</code></pre>
+<h2 id="oauth2-0">OAuth2.0</h2>
+<p>Built-in support for authenticating via OAuth2 has been provided, you can use the <code>getToken</code> method to perform any authentication method to retrieve a token from the OAuth server.</p>
+<h2 id="password">Password</h2>
+<pre><code class="lang-typescript">MyApiClient.getToken({
+  username: &#39;bob&#39;,
+  password: &#39;123123&#39;
+}, &#39;password&#39;).subscribe((token: any) =&gt; {
+  localStorage.setItem(&#39;access_token&#39;, token.access_token);
+  if(token.refresh_token) {
+      localStorage.setItem(&#39;refresh_token&#39;, token.refresh_token);
+  }
+});
+</code></pre>
+<h2 id="client-credentials">Client Credentials</h2>
+<pre><code class="lang-typescript">MyApiClient.getToken({}, &#39;client_credentials&#39;).subscribe((token: any) =&gt; {
+  localStorage.setItem(&#39;access_token&#39;, token.access_token);
+});
+</code></pre>
+<h2 id="authorization-code">Authorization Code</h2>
+<pre><code class="lang-typescript">MyApiClient.getToken({authorization_code: &#39;123&#39;}, &#39;auth_code&#39;).subscribe((token: any) =&gt; {
+  localStorage.setItem(&#39;access_token&#39;, token.access_token);
+});
+</code></pre>
+<h2 id="interceptors">Interceptors</h2>
+<h3 id="request-interceptor">Request Interceptor</h3>
+<p>The request interceptor allows you to modify request options globally</p>
+<pre><code class="lang-typescript">requestInterceptor(opts: RequestOptions) {
+  // You can modify the current request options here
+  return options;
+}
+</code></pre>
+<h3 id="request-interceptor">Request Interceptor</h3>
+<p>The response interceptor allows you to modify the return value from requests</p>
+<pre><code class="lang-typescript">responseInterceptor(res: Response) {
+  return res.json();
+}
+</code></pre>
+<h3 id="error-interceptor">Error Interceptor</h3>
+<p>The error interceptor allows you to handle erroneous requests</p>
+<pre><code class="lang-typescript">errorInterceptor(err, req) {
+  if(err.status === 401) {
+    localStorage.removeItem(&#39;token&#39;);
+    if(localStorage.getItem(&#39;refresh&#39;)) {
+      return this.getToken(&#39;refresh&#39;).mergeMap(req.retry);
+    }
+  }
+  return Observable.throw(err);
+}
+</code></pre>
+
+
+
+    <h2><a name="demo"
+           id="demo"></a>Demo</h2>
+    <app-root>Loading...</app-root>
+  </main>
+</div>
+
+<script async
+        defer
+        id="github-bjs"
+        src="https://buttons.github.io/buttons.js"></script>
+<script type="text/javascript" src="inline.552a96fd3777cf572a61.bundle.js"></script><script type="text/javascript" src="vendor.d493683a3570938843c9.bundle.js"></script><script type="text/javascript" src="main.d61aa68aadbb5ee6dbbf.bundle.js"></script></body>
+</html>
