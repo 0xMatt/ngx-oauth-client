@@ -40,8 +40,7 @@
     "*.md"
   ],
   "peerDependencies": {
-    "@angular/core": "^4.2.4",
-    "@angular/http": "^4.2.4"
+    "@angular/core": "^4.2.4"
   },
   "devDependencies": {
     "@angular/cli": "^1.0.0",
@@ -85,5 +84,8 @@
     "wallaby-webpack": "0.0.38",
     "web-animations-js": "^2.2.5",
     "zone.js": "^0.8.4"
+  },
+  "dependencies": {
+    "@angular/http": "^4.2.4"
   }
 }
