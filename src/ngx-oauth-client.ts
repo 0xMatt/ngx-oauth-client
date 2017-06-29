@@ -134,8 +134,8 @@ export abstract class NgxOAuthClient {
     const body = urlSearchParams.toString();
 
     return this.http.post(config.host + '/' + config.token, body, opts)
-      .map(this.responseInterceptor)
-      .catch(this.errorInterceptor);
+      .map(this.responseInterceptor.bind(this))
+      .catch(this.errorInterceptor.bind(this));
   }
 
   /**
@@ -171,8 +171,8 @@ export abstract class NgxOAuthClient {
     }
 
     return this.http[method](this.buildEndpoint(endpoint), data || {}, opts)
-      .map(this.responseInterceptor)
-      .catch(this.errorInterceptor);
+      .map(this.responseInterceptor.bind(this))
+      .catch(this.errorInterceptor.bind(this));
   }
 
   /**

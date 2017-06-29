@@ -111,8 +111,8 @@ var NgxOAuthClient = (function () {
         }
         var body = urlSearchParams.toString();
         return this.http.post(config.host + '/' + config.token, body, opts)
-            .map(this.responseInterceptor)
-            .catch(this.errorInterceptor);
+            .map(this.responseInterceptor.bind(this))
+            .catch(this.errorInterceptor.bind(this));
     };
     /**
      *
@@ -142,8 +142,8 @@ var NgxOAuthClient = (function () {
             this.requestInterceptor(opts);
         }
         return this.http[method](this.buildEndpoint(endpoint), data || {}, opts)
-            .map(this.responseInterceptor)
-            .catch(this.errorInterceptor);
+            .map(this.responseInterceptor.bind(this))
+            .catch(this.errorInterceptor.bind(this));
     };
     /**
      *
