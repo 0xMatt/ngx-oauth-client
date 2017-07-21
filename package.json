@@ -40,7 +40,7 @@
     "*.md"
   ],
   "peerDependencies": {
-    "@angular/core": "^4.2.4"
+    "@angular/core": "~4.2.4"
   },
   "devDependencies": {
     "@angular/cli": "^1.0.0",
