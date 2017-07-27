@@ -62,13 +62,20 @@ interface NgxOAuthConfig {
 
 Built-in support for authenticating via OAuth2 has been provided, you can use the `getToken` method to perform any authentication method to retrieve a token from the OAuth server.
 
+## Client Credentials
+
+```typescript
+MyApiClient.getToken().subscribe((token: any) => {
+  localStorage.setItem('access_token', token.access_token);
+});
+```
 
 ## Password
 ```typescript
-MyApiClient.getToken({
+MyApiClient.getToken('password', {
   username: 'bob',
   password: '123123'
-}, 'password').subscribe((token: any) => {
+}).subscribe((token: any) => {
   localStorage.setItem('access_token', token.access_token);
   if(token.refresh_token) {
       localStorage.setItem('refresh_token', token.refresh_token);
@@ -76,38 +83,37 @@ MyApiClient.getToken({
 });
 ```
 
-## Client Credentials
 
-```typescript
-MyApiClient.getToken({}, 'client_credentials').subscribe((token: any) => {
-  localStorage.setItem('access_token', token.access_token);
-});
-```
 
 ## Authorization Code
 
 ```typescript
-MyApiClient.getToken({authorization_code: '123'}, 'auth_code').subscribe((token: any) => {
+MyApiClient.getToken('authorization_code', {authorization_code: '123'}.subscribe((token: any) => {
   localStorage.setItem('access_token', token.access_token);
 });
 ```
 
 ## Interceptors
 
-### Request Interceptor
+Interceptors pre 0.2 were created manually, now you can refer to the official HTTPClient interceptors for support regarding adding your own.
 
-The request interceptor allows you to modify request options globally
+### Authorization Interceptor
 
+The authorization interceptor is built in and cannot be disabled(since that's mostly the pont of this library). If you would like to remove this functionality, you can make your own interceptor to remove it on your own specific conditions. e.g:
 ```typescript
-requestInterceptor(opts: RequestOptions) {
-  // You can modify the current request options here
-  return options;
+intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  const authHeader = localStorage.getItem('access_token');
+  if (req.headers.has('Authorization')) {
+    const authHeader = localStorage.getItem('access_token');
+    return next.handle(req.clone({headers: req.headers.delete('Authorization', `Bearer ${authHeader}`)}));
+  }
+  return next.handle(req);
 }
 ```
 
-### Request Interceptor
+### Retry interceptor
 
-The response interceptor allows you to modify the return value from requests
+The retry interceptor will catch any 401 status code responses, and attempt to grab another token from the server
 
 ```typescript
 responseInterceptor(res: Response) {
@@ -116,20 +122,3 @@ responseInterceptor(res: Response) {
 
 ```
 
-
-### Error Interceptor
-
-The error interceptor allows you to handle erroneous requests
-
-```typescript
-errorInterceptor(err, req) {
-  if(err.status === 401) {
-    localStorage.removeItem('token');
-    if(localStorage.getItem('refresh')) {
-      return this.getToken('refresh').mergeMap(req.retry);
-    }
-  }
-  return Observable.throw(err);
-}
-
-```

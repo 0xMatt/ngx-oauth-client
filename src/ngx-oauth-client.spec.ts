@@ -1,28 +1,21 @@
 import {inject, TestBed} from '@angular/core/testing';
-import {BaseRequestOptions, Http, HttpModule, RequestMethod, Response, ResponseOptions} from '@angular/http';
 import {DEFAULT_CFG} from './default-config';
-import {MockBackend, MockConnection} from '@angular/http/testing';
 import {NgxTestClient} from './ngx-testclient';
 import {NgxOAuthClient} from './ngx-oauth-client';
+import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
+import {NgxOAuthModule} from './ngx-oauth.module';
 
 describe('NgxOAuthClient', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpModule],
-      providers: [
-        BaseRequestOptions,
-        MockBackend,
-        {
-          provide: Http,
-          useFactory: (backend, defaultOptions) => {
-            return new Http(backend, defaultOptions)
-          },
-          deps: [MockBackend, BaseRequestOptions]
-        },
-        NgxTestClient,
-      ]
+      imports: [NgxOAuthModule, HttpClientTestingModule],
+      providers: [NgxTestClient]
     });
   });
+
+  afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
+    httpMock.verify();
+  }));
 
   it('should be created', inject([NgxTestClient], (service: NgxTestClient) => {
     expect(service instanceof NgxOAuthClient).toBeTruthy();
@@ -30,179 +23,90 @@ describe('NgxOAuthClient', () => {
 
   it('should have default configuration', inject([NgxTestClient], (service: NgxTestClient) => {
     expect(typeof service.getConfig()).toBe(typeof {});
-    expect(service.getConfig().host).toBe('http://23.239.30.127:8080');
+    expect(service.getConfig().host).toBe('http://127.0.0.1');
     expect(service.getConfig()).toBe(DEFAULT_CFG);
     expect(service.getDefaultHeaders()['Content-Type']).toBe('application/json');
   }));
-
-  it('should should remove leading slash from path', (done: any) => {
-    inject([NgxTestClient, MockBackend], (service: NgxTestClient, mockBackend: MockBackend) => {
-
-      mockBackend.connections.subscribe((connection: MockConnection) => {
-        expect(connection.request.method).toBe(RequestMethod.Get);
-        expect(connection.request.url).toBe('http://23.239.30.127:8080/api/status');
-
-        connection.mockRespond(new Response(
-          new ResponseOptions({body: ''})
-        ));
-      });
-
-      service.get('/api/status').subscribe(() => done());
-    })();
-  });
-
-  it('should convert get request parameters', (done: any) => {
-    inject([NgxTestClient, MockBackend], (service: NgxTestClient, mockBackend: MockBackend) => {
-
-      mockBackend.connections.subscribe((connection: MockConnection) => {
-        expect(connection.request.method).toBe(RequestMethod.Get);
-        expect(connection.request.url).toBe('http://23.239.30.127:8080/api/users?username=foo');
-
-        connection.mockRespond(new Response(
-          new ResponseOptions({url: 'http://23.239.30.127:8080/api/users?username=foo', body: {}})
-        ));
-      });
-
-      service.get('api/users', {username: 'foo'}).subscribe((response: Response) => {
-        expect(response.url).toEqual('http://23.239.30.127:8080/api/users?username=foo');
-        done();
-      });
-    })();
-  });
-
-
-  it('should be able to perform get requests', (done: any) => {
-    inject([NgxTestClient, MockBackend], (service: NgxTestClient, mockBackend: MockBackend) => {
-      const mockResponse = [
-        {id: 1, name: 'User 1'},
-        {id: 2, name: 'User 2'},
-        {id: 3, name: 'User 3'}
-      ];
-
-      mockBackend.connections.subscribe((connection: MockConnection) => {
-        expect(connection.request.method).toBe(RequestMethod.Get);
-        expect(connection.request.url).toBe('http://23.239.30.127:8080/api/users');
-
-        connection.mockRespond(new Response(
-          new ResponseOptions({body: mockResponse})
-        ));
-      });
-
-      service.get('api/users').subscribe((response: Response) => {
-        const res = response.json();
-        expect(res.length).toBe(3);
-        expect(res[0].name).toEqual('User 1');
-        expect(res[1].name).toEqual('User 2');
-        expect(res[2].name).toEqual('User 3');
-        done();
-      });
-    })();
-  });
-
-
-  it('should be able to perform post requests', (done: any) => {
-    inject([NgxTestClient, MockBackend], (service: NgxTestClient, mockBackend: MockBackend) => {
-
-      const mockResponse = {
-        username: 'bob',
-        email: 'bob@bob.com',
-        password: '123123'
-      };
-
-      mockBackend.connections.subscribe((connection: MockConnection) => {
-        expect(connection.request.method).toBe(RequestMethod.Post);
-        expect(connection.request.url).toBe('http://23.239.30.127:8080/api/users');
-        expect(JSON.stringify(JSON.parse(connection.request.getBody()))).toBe(JSON.stringify(mockResponse));
-
-        connection.mockRespond(new Response(
-          new ResponseOptions({body: mockResponse})
-        ));
-      });
-
-      service.post('api/users', mockResponse).subscribe((response: Response) => {
-        expect(response.json()).toBe(mockResponse);
-        done();
-      });
-    })();
-  });
-
-  it('should be able to perform put requests', (done: any) => {
-    inject([NgxTestClient, MockBackend], (service: NgxTestClient, mockBackend: MockBackend) => {
-
-      const mockResponse = {
-        username: 'bob',
-        email: 'bob@bob.com',
-        password: '123123'
-      };
-
-      mockBackend.connections.subscribe((connection: MockConnection) => {
-        expect(connection.request.method).toBe(RequestMethod.Put);
-        expect(connection.request.url).toBe('http://23.239.30.127:8080/api/users');
-        expect(JSON.stringify(JSON.parse(connection.request.getBody()))).toBe(JSON.stringify(mockResponse));
-
-        connection.mockRespond(new Response(
-          new ResponseOptions({body: mockResponse})
-        ));
-      });
-
-      service.put('api/users', mockResponse).subscribe((response: Response) => {
-        expect(response.json()).toBe(mockResponse);
-        done();
-      });
-    })();
-  });
-
-  it('should be able to perform delete requests', (done: any) => {
-    inject([NgxTestClient, MockBackend], (service: NgxTestClient, mockBackend: MockBackend) => {
-
-      mockBackend.connections.subscribe((connection: MockConnection) => {
-        expect(connection.request.method).toBe(RequestMethod.Delete);
-        expect(connection.request.url).toBe('http://23.239.30.127:8080/api/users/1');
-
-        connection.mockRespond(new Response(
-          new ResponseOptions({status: 204})
-        ));
-      });
-
-      service.delete('api/users/1').subscribe((response: Response) => {
-        expect(response.status).toBe(204);
-        done();
-      });
-    })();
-  });
-
-  it('should let response interceptor change return value', (done) => {
-    inject([NgxTestClient, MockBackend], (service: NgxTestClient, mockBackend: MockBackend) => {
-      const mockResponse = {healthy: true};
-      mockBackend.connections.subscribe((connection: MockConnection) => {
-        expect(connection.request.method).toBe(RequestMethod.Get);
-        expect(connection.request.url).toBe('http://23.239.30.127:8080/api/status');
-
-        connection.mockRespond(new Response(
-          new ResponseOptions({body: mockResponse})
-        ));
-      });
-
-      service.get('api/status').subscribe(response => {
-
-        service.responseInterceptor = function (res: Response) {
-          return res.json();
-        };
-
-        expect(service.responseInterceptor(response)).toEqual(mockResponse);
-        done();
-      });
-    })();
-  });
 
   it('should throw an error if endpoint is empty', inject([NgxTestClient], (service: NgxTestClient) => {
     expect(() => service.get('')).toThrow(new Error('Endpoint cannot be empty!'));
   }));
 
-  it('should be able to authenticate with getToken()', inject([NgxTestClient], (service: NgxTestClient, done: any) => {
-    service.getToken({username: 'matt', password: 123123}).subscribe(token => {
-      expect(token).toContain('access_token');
-      done();
-    });
+  it('should throw an error if an invalid grant_type is specified', inject([NgxTestClient], (service: NgxTestClient) => {
+    expect(() => service.getToken('foo')).toThrow(new Error('Grant type foo is not supported'));
   }));
+
+  it('expects a GET request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    http.get('/api/users').subscribe(data => expect(data['username']).toEqual('foo'));
+    const req = httpMock.expectOne('http://127.0.0.1/api/users');
+    expect(req.request.method).toEqual('GET');
+    req.flush({username: 'foo'});
+    httpMock.verify();
+  }));
+
+  it('expects GET parameters to pass as HttpParams',
+    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+      http.get('/api/users', {foo: 'bar'}).subscribe();
+      const req = httpMock.expectOne('http://127.0.0.1/api/users');
+      expect(req.request.method).toEqual('GET');
+      req.flush('foo=bar');
+      httpMock.verify();
+    }));
+
+  it('expects a POST request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    http.post('/api/users', {username: 'foo'}).subscribe(data => expect(data).toEqual({id: 1}));
+    const req = httpMock.expectOne('http://127.0.0.1/api/users');
+    expect(req.request.method).toEqual('POST');
+    req.flush({id: 1});
+    httpMock.verify();
+  }));
+
+  it('expects a PUT request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    http.put('/api/users/1', {username: 'foo'}).subscribe(data => expect(data).toEqual({id: 1}));
+    const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
+    expect(req.request.method).toEqual('PUT');
+    req.flush({id: 1});
+    httpMock.verify();
+  }));
+
+  it('expects a PATCH request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    http.patch('/api/users/1', {foo: 'bar'}).subscribe(data => expect(data).toEqual({foo: 'bar'}));
+    const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
+    expect(req.request.method).toEqual('PATCH');
+    req.flush({foo: 'bar'});
+    httpMock.verify();
+  }));
+
+  it('expects a DELETE request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    http.delete('/api/users/1').subscribe(data => expect(data).toEqual({}));
+    const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
+    expect(req.request.method).toEqual('DELETE');
+    req.flush({});
+    httpMock.verify();
+  }));
+
+  it('expects a options to override default values',
+    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+      http.get('/api/users/1', {foo: 'bar'}, {withCredentials: true}).subscribe(data => expect(data).toEqual({}));
+      const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
+      expect(req.request.method).toEqual('GET');
+      expect(req.request.withCredentials).toBe(true);
+      req.flush({});
+      httpMock.verify();
+    }));
+
+  it('can authenticate with password credentials',
+    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+      http.getToken().subscribe(data => expect(data).toEqual({
+        access_token: '123',
+        expires_in: 123
+      }));
+      const req = httpMock.expectOne('http://127.0.0.1/oauth/token');
+      expect(req.request.method).toEqual('POST');
+      req.flush({
+        access_token: '123',
+        expires_in: 123
+      });
+      httpMock.verify();
+    }));
 });

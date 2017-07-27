@@ -1,11 +1,11 @@
 import {NgModule} from '@angular/core';
-import {HttpModule} from '@angular/http';
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [],
-  imports: [HttpModule],
-  exports: [],
-  providers: []
+  imports: [HttpClientModule],
+  exports: [HttpClientModule],
+  providers: [],
 })
 export class NgxOAuthModule {
 

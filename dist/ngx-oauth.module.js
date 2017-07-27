@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
-var http_1 = require("@angular/http");
+var http_1 = require("@angular/common/http");
 var NgxOAuthModule = (function () {
     function NgxOAuthModule() {
     }
@@ -10,9 +10,9 @@ var NgxOAuthModule = (function () {
 NgxOAuthModule.decorators = [
     { type: core_1.NgModule, args: [{
                 declarations: [],
-                imports: [http_1.HttpModule],
-                exports: [],
-                providers: []
+                imports: [http_1.HttpClientModule],
+                exports: [http_1.HttpClientModule],
+                providers: [],
             },] },
 ];
 /** @nocollapse */
