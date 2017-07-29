@@ -1,26 +1,52 @@
-import { Headers, Http, RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { NgxOAuthConfig } from './config-interface';
+import { HttpClient } from '@angular/common/http';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+import 'rxjs/observable/throw';
+import 'rxjs/add/observable/empty';
+import 'rxjs/add/operator/skip';
+import { NgxOAuthResponse } from './ngx-oauth-response';
 export declare abstract class NgxOAuthClient {
-    protected http: Http;
-    protected headers: Headers;
+    private http;
     protected config: NgxOAuthConfig;
+    protected token: any;
     /**
      *
-     * @param http
+     * @param {HttpClient} http
      */
-    constructor(http: Http);
+    constructor(http: HttpClient);
     getConfig(): any;
     getDefaultHeaders(): any;
     /**
      *
+     * @param request
+     * @returns {any}
+     */
+    requestInterceptor(request: any): any;
+    /**
+     *
+     * @param request
+     * @param response
+     * @returns {any}
+     */
+    responseInterceptor(request: any, response: any): any;
+    /**
+     *
+     * @param request
+     * @param error
+     * @returns {any}
+     */
+    errorInterceptor(request: any, error: any): any;
+    getClient(): HttpClient;
+    /**
+     *
      * @param endpoint
      * @param query
+     * @param options
      * @returns {Observable<any>}
      */
-    get(endpoint: string, query?: any): Observable<any>;
+    get(endpoint: string, query?: any, options?: any): Observable<any>;
     /**
      *
      * @param endpoint
@@ -28,7 +54,7 @@ export declare abstract class NgxOAuthClient {
      * @param options
      * @returns {Observable<any>}
      */
-    post(endpoint: string, data: Object, options?: Object): Observable<any>;
+    post(endpoint: string, data: any, options?: Object): Observable<any>;
     /**
      *
      * @param endpoint
@@ -36,7 +62,7 @@ export declare abstract class NgxOAuthClient {
      * @param options
      * @returns {Observable<any>}
      */
-    put(endpoint: string, data: Object, options?: Object): Observable<any>;
+    put(endpoint: string, data: any, options?: Object): Observable<any>;
     /**
      *
      * @param endpoint
@@ -44,41 +70,56 @@ export declare abstract class NgxOAuthClient {
      * @param options
      * @returns {Observable<any>}
      */
-    delete(endpoint: string, data?: Object, options?: Object): Observable<any>;
+    patch(endpoint: string, data: any, options?: Object): Observable<any>;
     /**
      *
+     * @param endpoint
+     * @param data
      * @param options
+     * @returns {Observable<any>}
      */
-    requestInterceptor(options: RequestOptions): any;
-    /**
-     * @param res
-     * @return {Response}
-     */
-    responseInterceptor(res: Response): any;
-    /**
-     *
-     * @param error
-     * @returns {ErrorObservable<any>}
-     */
-    errorInterceptor(error: any): ErrorObservable;
+    delete(endpoint: string, options?: Object): Observable<any>;
     /**
      * Uses formtype to comply with the OAuth2.0 Spec, this will not change
      *
      * @param data
      * @param grant_type
-     * @returns {Observable<Response>}
-     */
-    getToken(data: any, grant_type?: string): Observable<Response>;
-    /**
-     *
-     * @param method
-     * @param endpoint
-     * @param data
-     * @param options
-     * @param intercept
      * @returns {Observable<any>}
      */
-    protected request(method: string, endpoint: string, data?: any, options?: any, intercept?: boolean): Observable<any>;
+    getToken(grant_type?: string, data?: any): Observable<NgxOAuthResponse>;
+    setToken(token: NgxOAuthResponse): void;
+    /**
+     *
+     * @param {string} key
+     * @returns {any}
+     */
+    fetchToken(key?: string): any;
+    /**
+     * Performs an HTTP request
+     *
+     * @param {string} method
+     * @param {string} endpoint
+     * @param payload
+     * @param options
+     * @returns {Observable<any>}
+     */
+    protected request(method: any, endpoint: string, payload: any, options: any): any;
+    /**
+     * Fetch options and fallback to config defaults
+     * @param options
+     * @param option
+     * @param fallback
+     * @returns {any}
+     */
+    protected fetchOption(options: any, option: any, fallback?: any): any;
+    /**
+     *
+     * @param key
+     * @param fallback
+     * @returns {any}
+     */
+    protected fetchConfig(key: any, fallback?: any): any;
+    protected fetchStorageName(): string;
     /**
      *
      * @param endpoint

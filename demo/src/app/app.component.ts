@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {ApiService} from './api.service';
-import {Headers, RequestOptions, Response} from '@angular/http';
 import {environment} from '../environments/environment';
+import {HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
+import {Observable} from 'rxjs/Observable';
 
 @Component({
   selector: 'app-root',
@@ -15,9 +16,20 @@ export class AppComponent implements OnInit {
    */
   methods: any = [];
 
-  headers: any = [];
+  /**
+   *
+   * @type {Array}
+   */
+  headers = {};
 
+  /**
+   *
+   * @type {{production: boolean; api: {host: string}}}
+   */
   environment: any = environment;
+
+  token;
+
   /**
    * @param request HttpRequest
    */
@@ -26,7 +38,26 @@ export class AppComponent implements OnInit {
   /**
    * @param response HttpResponse
    */
-  response: Response;
+  response: HttpResponse<any> | HttpErrorResponse;
+
+  /**
+   *
+   */
+  responseBody: Object;
+  tokenGrantType = 'client_credentials';
+  tokenRequest = {
+    password: {
+      grant_type: 'password',
+      client_id: 'web_client',
+      username: 'matt',
+      password: '123123'
+    },
+    client_credentials: {
+      grant_type: 'client_credentials',
+      client_id: 'clientcredentials',
+      client_secret: '9njAFeYTGe8zLs4ciF5vSzFR25LZoR0B'
+    }
+  };
 
   /**
    * @constructor
@@ -41,40 +72,66 @@ export class AppComponent implements OnInit {
     }
 
     this.request = {
-      url: '',
+      url: 'users/1',
       method: 'GET',
-      data: [],
-      options: new RequestOptions()
+      options: {}
     };
-    this.addHeader('', '');
+
+    const authToken = localStorage.getItem('auth_token');
+
+    if (typeof authToken === 'string') {
+      this.token = JSON.parse(authToken);
+    }
+
+    // this.addHeader('', '');
   }
 
   ngOnInit() {
-    this.request = {
-      url: 'users/1',
-      method: 'GET',
-      options: new RequestOptions()
-    };
     this.sendRequest(this.request);
+  }
+
+  getToken() {
+    this.api.getToken(this.tokenGrantType, this.tokenRequest[this.tokenGrantType]).subscribe(response => {
+      this.token = response;
+      localStorage.setItem('auth_token', JSON.stringify(response));
+    });
+  }
+
+  switchGrantType(type) {
+    this.tokenGrantType = type;
   }
 
   /**
    * @param request
    */
   sendRequest(request: HttpRequest): void {
-    request.options.headers = new Headers();
-    this.headers.filter((header: any) => {
-      return header.key !== '';
-    }).forEach((header: any) => {
-      if (request.options.headers === null) {
-        request.options.headers = new Headers();
-      }
+    const headers = this.headers,
+      observe = 'response';
 
-      request.options.headers.append(header.key, header.value);
-    });
-    this.api[request.method.toLowerCase()](request.url, request.data, request.options).subscribe((res: Response) => {
+    let req: Observable<any>;
+    const method = request.method.toLowerCase();
+    if (['GET', 'DELETE', 'HEAD'].indexOf(request.method) !== -1) {
+      req = this.api[method](this.request.url, {}, {headers, observe});
+    } else {
+      req = this.api[method](this.request.url, this.request.data, {headers, observe});
+    }
+
+    req.subscribe((res: any) => {
+      const body = res.body;
+      this.responseBody = body;
+      delete res.body;
       this.response = res;
-    }, (err: any) => this.response = err);
+    }, (err: HttpErrorResponse) => {
+      this.response = err;
+    });
+  }
+
+  getResponseType() {
+    if (this.response instanceof HttpResponse) {
+      return 'response';
+    } else if (this.response instanceof HttpErrorResponse) {
+      return 'error';
+    }
   }
 
   /**
@@ -88,18 +145,33 @@ export class AppComponent implements OnInit {
     this.request.method = method;
   }
 
+  removeToken(token: string) {
+    const storageToken = localStorage.getItem('auth_token');
+    this.token[token] = 'invalid';
+    if (storageToken) {
+      const parsedToken = JSON.parse(storageToken);
+      parsedToken[token] = 'invalid';
+      localStorage.setItem('auth_token', JSON.stringify(parsedToken));
+    }
+  }
+
+  clearToken() {
+    localStorage.removeItem('auth_token');
+    this.token = undefined;
+  }
+
   /**
    *
    */
   addHeader(key: string, value: string) {
-    this.headers.push({key, value});
+    this.headers[key] = value;
   }
 
   /**
-   * @param index
+   * @param key
    */
-  removeHeader(index: number) {
-    this.headers.splice(index, 1);
+  removeHeader(key: string) {
+    delete this.headers[key];
   }
 }
 
@@ -107,7 +179,10 @@ export class AppComponent implements OnInit {
 export interface HttpRequest {
   url: string;
   method: string;
-  options: RequestOptions;
+  options: {
+    headers?: HttpHeaders
+    observe?: string;
+  };
   data?: any;
 }
 
