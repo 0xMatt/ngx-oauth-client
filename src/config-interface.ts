@@ -4,9 +4,4 @@ export interface NgxOAuthConfig {
   key?: string;
   secret?: string;
   storage_prefix?: string;
-  withCredentials?: boolean;
-  tokens?: {
-    access: string,
-    refresh?: string
-  };
 }

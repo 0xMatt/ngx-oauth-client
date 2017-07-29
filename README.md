@@ -5,7 +5,7 @@
 ngx-oauth-client
 ===========
 
-*ngx-oauth-client* is an Angular2/4 HTTP/OAuth2 client. This package allows you to set up multiple clients to interface with many OAuth2 compliant APIs.
+*ngx-oauth-client* is an Angular4 HTTP/OAuth2 client utilizing the HttpClient. This package allows you to set up multiple clients to interface with many OAuth2 compliant APIs.
 
 Check out the [demo](http://0xMatt.github.io/ngx-oauth-client/#demo)!
 
@@ -39,9 +39,7 @@ import {NgxOAuthClient, DefaultHeaders, Configuration} from 'ngx-oauth-client';
   'Accept': 'application/json'
 })
 export class MyApiClient extends NgxOAuthClient {
-    responseIntereptor(response: Response) {
-      return response.json();
-    }
+
 }
 
 ```
@@ -54,6 +52,7 @@ interface NgxOAuthConfig {
   token?: string;
   key?: string;
   secret?: string;
+  storage_prefix? string;
 }
 
 ```
@@ -62,11 +61,14 @@ interface NgxOAuthConfig {
 
 Built-in support for authenticating via OAuth2 has been provided, you can use the `getToken` method to perform any authentication method to retrieve a token from the OAuth server.
 
+You may use `fetchToken(key?)` to retrieve details about a specific token property or get the entire `NgxOAuthResponse` object by not supplying a value to the function parameter.
+
 ## Client Credentials
 
 ```typescript
-MyApiClient.getToken().subscribe((token: any) => {
-  localStorage.setItem('access_token', token.access_token);
+MyApiClient.getToken().subscribe((token: NgxOAuthResponse) => {
+  // Token is already set for you
+  MyApiClient.fetchToken('access_token'); // your_token_from_response
 });
 ```
 
@@ -75,50 +77,80 @@ MyApiClient.getToken().subscribe((token: any) => {
 MyApiClient.getToken('password', {
   username: 'bob',
   password: '123123'
-}).subscribe((token: any) => {
-  localStorage.setItem('access_token', token.access_token);
-  if(token.refresh_token) {
-      localStorage.setItem('refresh_token', token.refresh_token);
-  }
+}).subscribe((token: NgxOAuthResponse) => {
+  // Token is already set for you
+  MyApiClient.fetchToken('access_token'); // your_access_token_from_response
+  MyApiClient.fetchToken('refresh_token'); // your_refresh_token_from_response
 });
 ```
-
-
 
 ## Authorization Code
 
 ```typescript
-MyApiClient.getToken('authorization_code', {authorization_code: '123'}.subscribe((token: any) => {
-  localStorage.setItem('access_token', token.access_token);
+MyApiClient.getToken('authorization_code', {authorization_code: '123'}.subscribe((token: NgxOAuthResponse) => {
+  // Token is already set for you
+  MyApiClient.fetchToken('access_token'); // your_access_token_from_response
+  MyApiClient.fetchToken('refresh_token'); // your_refresh_token_from_response
 });
 ```
 
 ## Interceptors
 
-Interceptors pre 0.2 were created manually, now you can refer to the official HTTPClient interceptors for support regarding adding your own.
+While the HttpClient now providers interceptors, they are in fact global. Having interceptor methods allows you to have client-specific interceptor rules.
 
-### Authorization Interceptor
+### Request Interceptor
 
-The authorization interceptor is built in and cannot be disabled(since that's mostly the pont of this library). If you would like to remove this functionality, you can make your own interceptor to remove it on your own specific conditions. e.g:
+The example demonstrates adding an authorization header to your requests if your criteria is met.
+
 ```typescript
-intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-  const authHeader = localStorage.getItem('access_token');
-  if (req.headers.has('Authorization')) {
-    const authHeader = localStorage.getItem('access_token');
-    return next.handle(req.clone({headers: req.headers.delete('Authorization', `Bearer ${authHeader}`)}));
+requestInterceptor(request) {
+    const auth = this.fetchToken();
+    if (auth) {
+      return request.setHeaders({Authorization: auth.token_type + auth.access_token});
+    }
+
+    return request;
+}
+```
+
+### Request Interceptor
+
+The response interceptor allows you to modify the return value from requests
+
+```typescript
+responseInterceptor(request, response) {
+  return response;
+}
+
+```
+
+
+### Error Interceptor
+
+The error interceptor allows you to handle erroneous requests
+
+```typescript
+errorInterceptor(request, error): Observable<any> {
+  if (error.status === 401) {
+    const refresh_token = this.fetchToken('refresh_token');
+    if (!refresh_token) {
+      return Observable.throw(error);
+    }
+    return this.getToken('refresh_token', {refresh_token}).switchMap(token => {
+      localStorage.setItem('auth_token', JSON.stringify(token));
+      return this.getClient().request(
+        request.method,
+        request.url,
+        this.requestInterceptor(request.setHeaders({Authorization: 'Bearer ' + token}))
+      );
+    });
   }
-  return next.handle(req);
-}
-```
-
-### Retry interceptor
-
-The retry interceptor will catch any 401 status code responses, and attempt to grab another token from the server
-
-```typescript
-responseInterceptor(res: Response) {
-  return res.json();
+  return Observable.throw(error);
 }
 
 ```
 
+### Credits
+
+ - [KnetikCloud](http://knetikcloud.com) for providing the backend service that the demo utilizes
+ - [@johannesjo](https://github.com/johannesjo) for his [angular generator](https://github.com/johannesjo/generator-angular2-lib) used for building this library

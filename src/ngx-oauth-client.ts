@@ -1,13 +1,14 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {NgxOAuthConfig} from './config-interface';
-import {HttpClient, HttpHandler, HttpHeaders, HttpParams, HttpRequest, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {NgxRequest} from './ngx-request';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import 'rxjs/observable/throw';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/operator/skip';
+import {NgxOAuthResponse} from './ngx-oauth-response';
 
 
 @Injectable()
@@ -20,9 +21,8 @@ export abstract class NgxOAuthClient {
   /**
    *
    * @param {HttpClient} http
-   * @param {HttpHandler} handler
    */
-  constructor(private http: HttpClient, private handler: HttpHandler) {
+  constructor(private http: HttpClient) {
   }
 
   getConfig(): any {
@@ -33,17 +33,29 @@ export abstract class NgxOAuthClient {
 
   /**
    *
-   * @param {HttpRequest<any>} request
-   * @returns {HttpRequest<any>}
+   * @param request
+   * @returns {any}
    */
   requestInterceptor(request) {
     return request;
   }
 
+  /**
+   *
+   * @param request
+   * @param response
+   * @returns {any}
+   */
   responseInterceptor(request, response) {
     return response;
   }
 
+  /**
+   *
+   * @param request
+   * @param error
+   * @returns {any}
+   */
   errorInterceptor(request, error) {
     return error;
   }
@@ -114,7 +126,7 @@ export abstract class NgxOAuthClient {
    * @param grant_type
    * @returns {Observable<any>}
    */
-  public getToken(grant_type?: string, data?: any): Observable<any> {
+  public getToken(grant_type?: string, data?: any): Observable<NgxOAuthResponse> {
 
     if (grant_type && ['client_credentials', 'authorization_code', 'password', 'refresh_token'].indexOf(grant_type) === -1) {
       throw new Error(`Grant type ${grant_type} is not supported`);
@@ -143,7 +155,14 @@ export abstract class NgxOAuthClient {
 
     const headers = new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'});
 
-    return this.http.post(config.host + '/' + config.token, params.join('&'), {headers});
+    return this.http.post(config.host + '/' + config.token, params.join('&'), {headers}).map((res: NgxOAuthResponse) => {
+      this.setToken(res);
+      return res;
+    });
+  }
+
+  setToken(token: NgxOAuthResponse) {
+    localStorage.setItem(this.fetchStorageName(), JSON.stringify(token));
   }
 
   /**
@@ -152,7 +171,8 @@ export abstract class NgxOAuthClient {
    * @returns {any}
    */
   fetchToken(key?: string): any {
-    const token = localStorage.getItem('auth_token');
+
+    const token = localStorage.getItem(this.fetchStorageName());
     if (token) {
       const parsedToken = JSON.parse(token);
       if (key && parsedToken.hasOwnProperty(key)) {
@@ -220,6 +240,18 @@ export abstract class NgxOAuthClient {
       return this.getConfig()[key];
     }
     return fallback;
+  }
+
+  protected fetchStorageName(): string {
+    const prefix: string = this.fetchConfig('storage_prefix');
+    const suffix = 'auth_token';
+
+    let token = '';
+    if (prefix) {
+      token += prefix;
+    }
+    token += suffix;
+    return token;
   }
 
   /**

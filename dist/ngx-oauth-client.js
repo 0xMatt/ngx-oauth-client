@@ -12,11 +12,9 @@ var NgxOAuthClient = (function () {
     /**
      *
      * @param {HttpClient} http
-     * @param {HttpHandler} handler
      */
-    function NgxOAuthClient(http, handler) {
+    function NgxOAuthClient(http) {
         this.http = http;
-        this.handler = handler;
     }
     NgxOAuthClient.prototype.getConfig = function () {
     };
@@ -24,15 +22,27 @@ var NgxOAuthClient = (function () {
     };
     /**
      *
-     * @param {HttpRequest<any>} request
-     * @returns {HttpRequest<any>}
+     * @param request
+     * @returns {any}
      */
     NgxOAuthClient.prototype.requestInterceptor = function (request) {
         return request;
     };
+    /**
+     *
+     * @param request
+     * @param response
+     * @returns {any}
+     */
     NgxOAuthClient.prototype.responseInterceptor = function (request, response) {
         return response;
     };
+    /**
+     *
+     * @param request
+     * @param error
+     * @returns {any}
+     */
     NgxOAuthClient.prototype.errorInterceptor = function (request, error) {
         return error;
     };
@@ -97,6 +107,7 @@ var NgxOAuthClient = (function () {
      * @returns {Observable<any>}
      */
     NgxOAuthClient.prototype.getToken = function (grant_type, data) {
+        var _this = this;
         if (grant_type && ['client_credentials', 'authorization_code', 'password', 'refresh_token'].indexOf(grant_type) === -1) {
             throw new Error("Grant type " + grant_type + " is not supported");
         }
@@ -118,7 +129,13 @@ var NgxOAuthClient = (function () {
             }
         }
         var headers = new http_1.HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
-        return this.http.post(config.host + '/' + config.token, params.join('&'), { headers: headers });
+        return this.http.post(config.host + '/' + config.token, params.join('&'), { headers: headers }).map(function (res) {
+            _this.setToken(res);
+            return res;
+        });
+    };
+    NgxOAuthClient.prototype.setToken = function (token) {
+        localStorage.setItem(this.fetchStorageName(), JSON.stringify(token));
     };
     /**
      *
@@ -126,7 +143,7 @@ var NgxOAuthClient = (function () {
      * @returns {any}
      */
     NgxOAuthClient.prototype.fetchToken = function (key) {
-        var token = localStorage.getItem('auth_token');
+        var token = localStorage.getItem(this.fetchStorageName());
         if (token) {
             var parsedToken = JSON.parse(token);
             if (key && parsedToken.hasOwnProperty(key)) {
@@ -189,6 +206,16 @@ var NgxOAuthClient = (function () {
         }
         return fallback;
     };
+    NgxOAuthClient.prototype.fetchStorageName = function () {
+        var prefix = this.fetchConfig('storage_prefix');
+        var suffix = 'auth_token';
+        var token = '';
+        if (prefix) {
+            token += prefix;
+        }
+        token += suffix;
+        return token;
+    };
     /**
      *
      * @param endpoint
@@ -211,7 +238,6 @@ NgxOAuthClient.decorators = [
 /** @nocollapse */
 NgxOAuthClient.ctorParameters = function () { return [
     { type: http_1.HttpClient, },
-    { type: http_1.HttpHandler, },
 ]; };
 exports.NgxOAuthClient = NgxOAuthClient;
 /**

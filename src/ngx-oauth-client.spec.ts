@@ -4,6 +4,8 @@ import {NgxTestClient} from './ngx-testclient';
 import {NgxOAuthClient} from './ngx-oauth-client';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 import {NgxOAuthModule} from './ngx-oauth.module';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs/Observable';
 
 describe('NgxOAuthClient', () => {
   beforeEach(() => {
@@ -11,14 +13,31 @@ describe('NgxOAuthClient', () => {
       imports: [NgxOAuthModule, HttpClientTestingModule],
       providers: [NgxTestClient]
     });
+
+    let store = {};
+
+    spyOn(localStorage, 'getItem').and.callFake((key: string): String => {
+      return store[key] || null;
+    });
+    spyOn(localStorage, 'removeItem').and.callFake((key: string): void => {
+      delete store[key];
+    });
+
+    spyOn(localStorage, 'setItem').and.callFake((key: string, value: string): string => {
+      return store[key] = <string>value;
+    });
+    spyOn(localStorage, 'clear').and.callFake(() => {
+      store = {};
+    });
   });
 
   afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
     httpMock.verify();
   }));
 
-  it('should be created', inject([NgxTestClient], (service: NgxTestClient) => {
-    expect(service instanceof NgxOAuthClient).toBeTruthy();
+  it('should be created via dependency injection', inject([NgxTestClient], (service: NgxTestClient) => {
+    expect(service instanceof NgxOAuthClient).toBe(true);
+    expect(service.getClient() instanceof HttpClient).toBe(true);
   }));
 
   it('should have default configuration', inject([NgxTestClient], (service: NgxTestClient) => {
@@ -26,6 +45,10 @@ describe('NgxOAuthClient', () => {
     expect(service.getConfig().host).toBe('http://127.0.0.1');
     expect(service.getConfig()).toBe(DEFAULT_CFG);
     expect(service.getDefaultHeaders()['Content-Type']).toBe('application/json');
+  }));
+
+  it('should return the HTTPCleint when getClient() is called', inject([NgxTestClient], (service: NgxTestClient) => {
+    expect(service.getClient() instanceof HttpClient).toBe(true);
   }));
 
   it('should throw an error if endpoint is empty', inject([NgxTestClient], (service: NgxTestClient) => {
@@ -85,6 +108,19 @@ describe('NgxOAuthClient', () => {
     httpMock.verify();
   }));
 
+  it('should have errors intercepted', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    http.get('/api/users').subscribe(
+      data => {
+      },
+      err => expect(err instanceof TypeError).toEqual(true)
+    );
+    const req = httpMock.expectOne('http://127.0.0.1/api/users');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush({success: false}, {status: 400, statusText: 'Bad Request'});
+    httpMock.verify();
+  }));
+
   it('expects a options to override default values',
     inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
       http.get('/api/users/1', {foo: 'bar'}, {withCredentials: true}).subscribe(data => expect(data).toEqual({}));
@@ -94,6 +130,33 @@ describe('NgxOAuthClient', () => {
       req.flush({});
       httpMock.verify();
     }));
+
+  it('should provide specific token key if requested', inject([NgxTestClient], (http: NgxTestClient) => {
+    localStorage.setItem('client_auth_token', JSON.stringify({
+      access_token: '123'
+    }));
+
+    expect(http.fetchToken('access_token')).toBe('123');
+    expect(localStorage.getItem).toHaveBeenCalled();
+  }));
+
+  it('should provide full token token object if no key is specified', inject([NgxTestClient], (http: NgxTestClient) => {
+    localStorage.setItem('client_auth_token', JSON.stringify({
+      access_token: '123'
+    }));
+
+    expect(http.fetchToken()).toEqual({
+      access_token: '123'
+    });
+    expect(localStorage.getItem).toHaveBeenCalled();
+  }));
+
+  it('should return null if a token is requested but not set', inject([NgxTestClient], (http: NgxTestClient) => {
+
+    expect(http.fetchToken()).toEqual(null);
+    expect(localStorage.getItem).toHaveBeenCalled();
+  }));
+
 
   it('can authenticate with password credentials',
     inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {

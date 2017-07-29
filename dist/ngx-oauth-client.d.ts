@@ -1,31 +1,42 @@
 import { Observable } from 'rxjs/Observable';
 import { NgxOAuthConfig } from './config-interface';
-import { HttpClient, HttpHandler } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import 'rxjs/observable/throw';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/operator/skip';
+import { NgxOAuthResponse } from './ngx-oauth-response';
 export declare abstract class NgxOAuthClient {
     private http;
-    private handler;
     protected config: NgxOAuthConfig;
     protected token: any;
     /**
      *
      * @param {HttpClient} http
-     * @param {HttpHandler} handler
      */
-    constructor(http: HttpClient, handler: HttpHandler);
+    constructor(http: HttpClient);
     getConfig(): any;
     getDefaultHeaders(): any;
     /**
      *
-     * @param {HttpRequest<any>} request
-     * @returns {HttpRequest<any>}
+     * @param request
+     * @returns {any}
      */
     requestInterceptor(request: any): any;
+    /**
+     *
+     * @param request
+     * @param response
+     * @returns {any}
+     */
     responseInterceptor(request: any, response: any): any;
+    /**
+     *
+     * @param request
+     * @param error
+     * @returns {any}
+     */
     errorInterceptor(request: any, error: any): any;
     getClient(): HttpClient;
     /**
@@ -75,7 +86,8 @@ export declare abstract class NgxOAuthClient {
      * @param grant_type
      * @returns {Observable<any>}
      */
-    getToken(grant_type?: string, data?: any): Observable<any>;
+    getToken(grant_type?: string, data?: any): Observable<NgxOAuthResponse>;
+    setToken(token: NgxOAuthResponse): void;
     /**
      *
      * @param {string} key
@@ -107,6 +119,7 @@ export declare abstract class NgxOAuthClient {
      * @returns {any}
      */
     protected fetchConfig(key: any, fallback?: any): any;
+    protected fetchStorageName(): string;
     /**
      *
      * @param endpoint
