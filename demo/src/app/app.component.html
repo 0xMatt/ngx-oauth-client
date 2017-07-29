@@ -17,24 +17,24 @@
                         POST
                     </button>
                 </div><!-- /btn-group -->
-                <input type="text" class="form-control" aria-label="..." value="oauth/v2/token" name="url" disabled>
+                <input type="text" class="form-control" aria-label="..." value="oauth/token" name="url" disabled>
             </div><!-- /input-group -->
             <br>
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active">
-                    <a href="#clientcredentials" aria-controls="clientcredentials" role="tab" data-toggle="tab"
+                    <a href="#token-clientcredentials" aria-controls="clientcredentials" role="tab" data-toggle="tab"
                        (click)="switchGrantType('client_credentials')">Client Credentials</a>
                 </li>
                 <li role="presentation">
-                    <a href="#password" aria-controls="password" role="tab" data-toggle="tab"
+                    <a href="#token-password" aria-controls="password" role="tab" data-toggle="tab"
                        (click)="switchGrantType('password')">Password</a>
                 </li>
             </ul>
 
             <!-- Tab panes -->
             <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="clientcredentials" data-toggle="tab">
+                <div role="tabpanel" class="tab-pane active" id="token-clientcredentials" data-toggle="tab">
                     <label for="client_id">Client ID</label>
                     <input type="text" name="client_id" id="client_id"
                            [(ngModel)]="tokenRequest.client_credentials.client_id" class="form-control"/>
@@ -42,7 +42,7 @@
                     <input type="text" name="client_secret" id="client_secret"
                            [(ngModel)]="tokenRequest.client_credentials.client_secret" class="form-control"/>
                 </div>
-                <div role="tabpanel" class="tab-pane" id="password" data-toggle="tab">
+                <div role="tabpanel" class="tab-pane" id="token-password" data-toggle="tab">
                     <div class="row">
                         <div class="col-xs-12">
                             <label for="username">Username</label>
@@ -102,7 +102,7 @@
     </div>
     <div class="panel-body">
         <form #form="ngForm" (ngSubmit)="sendRequest(request)">
-            <label for="basic-url">URL</label>
+            <label for="url">URL</label>
             <div class="input-group">
                 <div class="input-group-btn">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
@@ -113,7 +113,7 @@
                         </li>
                     </ul>
                 </div><!-- /btn-group -->
-                <input type="text" class="form-control" aria-label="..." [(ngModel)]="request.url" name="url" required>
+                <input type="text" class="form-control" aria-label="..." [(ngModel)]="request.url" name="url" id="url" required>
             </div><!-- /input-group -->
             <br>
             <!-- Nav tabs -->

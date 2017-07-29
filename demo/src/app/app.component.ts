@@ -122,6 +122,7 @@ export class AppComponent implements OnInit {
       delete res.body;
       this.response = res;
     }, (err: HttpErrorResponse) => {
+      this.responseBody = err.error;
       this.response = err;
     });
   }
