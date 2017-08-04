@@ -195,7 +195,7 @@ export abstract class NgxOAuthClient {
    */
   protected request(method, endpoint: string, payload, options): any {
     const request = new NgxRequest(method, this.buildEndpoint(endpoint));
-    if (method === 'GET') {
+    if (method === 'GET' && payload && Object.keys(payload).length > 0) {
       request.setParams(payload);
     }
 

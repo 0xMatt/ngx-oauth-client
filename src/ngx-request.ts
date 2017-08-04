@@ -37,12 +37,14 @@ export class NgxRequest {
   }
 
   setParams(params): NgxRequest {
-    this.params = new HttpParams();
+    const httpParams = new HttpParams();
+    let resource;
     for (const key in params) {
       if (typeof params === 'object' && params.hasOwnProperty(key)) {
-        this.params.set(key, key[params]);
+        resource = httpParams.set(key, params[key]);
       }
     }
+    this.params = resource;
     return this;
   }
 

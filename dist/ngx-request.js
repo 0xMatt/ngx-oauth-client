@@ -19,12 +19,14 @@ var NgxRequest = (function () {
         return this;
     };
     NgxRequest.prototype.setParams = function (params) {
-        this.params = new http_1.HttpParams();
+        var httpParams = new http_1.HttpParams();
+        var resource;
         for (var key in params) {
             if (typeof params === 'object' && params.hasOwnProperty(key)) {
-                this.params.set(key, key[params]);
+                resource = httpParams.set(key, params[key]);
             }
         }
+        this.params = resource;
         return this;
     };
     NgxRequest.prototype.setReportProgress = function (value) {

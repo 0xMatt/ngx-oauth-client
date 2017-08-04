@@ -70,7 +70,7 @@ describe('NgxOAuthClient', () => {
   it('expects GET parameters to pass as HttpParams',
     inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
       http.get('/api/users', {foo: 'bar'}).subscribe();
-      const req = httpMock.expectOne('http://127.0.0.1/api/users');
+      const req = httpMock.expectOne('http://127.0.0.1/api/users?foo=bar');
       expect(req.request.method).toEqual('GET');
       req.flush('foo=bar');
       httpMock.verify();
@@ -123,7 +123,7 @@ describe('NgxOAuthClient', () => {
 
   it('expects a options to override default values',
     inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
-      http.get('/api/users/1', {foo: 'bar'}, {withCredentials: true}).subscribe(data => expect(data).toEqual({}));
+      http.get('/api/users/1', {}, {withCredentials: true}).subscribe(data => expect(data).toEqual({}));
       const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
       expect(req.request.method).toEqual('GET');
       expect(req.request.withCredentials).toBe(true);

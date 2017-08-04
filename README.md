@@ -113,12 +113,13 @@ requestInterceptor(request) {
 }
 ```
 
-### Request Interceptor
+### Response Interceptor
 
 The response interceptor allows you to modify the return value from requests
 
 ```typescript
 responseInterceptor(request, response) {
+  console.info(`Response from ${request.url}`, response);
   return response;
 }
 
@@ -137,11 +138,10 @@ errorInterceptor(request, error): Observable<any> {
       return Observable.throw(error);
     }
     return this.getToken('refresh_token', {refresh_token}).switchMap(token => {
-      localStorage.setItem('auth_token', JSON.stringify(token));
       return this.getClient().request(
         request.method,
         request.url,
-        this.requestInterceptor(request.setHeaders({Authorization: 'Bearer ' + token}))
+        this.requestInterceptor(request.setHeaders({Authorization: `${token.token_type} ${token.access_token}`}))
       );
     });
   }

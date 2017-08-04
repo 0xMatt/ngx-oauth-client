@@ -165,7 +165,7 @@ var NgxOAuthClient = (function () {
     NgxOAuthClient.prototype.request = function (method, endpoint, payload, options) {
         var _this = this;
         var request = new ngx_request_1.NgxRequest(method, this.buildEndpoint(endpoint));
-        if (method === 'GET') {
+        if (method === 'GET' && payload && Object.keys(payload).length > 0) {
             request.setParams(payload);
         }
         if (['POST', 'PUT', 'PATCH'].indexOf(method) !== -1) {
