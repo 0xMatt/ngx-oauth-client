@@ -119,6 +119,11 @@ export declare abstract class NgxOAuthClient {
      * @returns {any}
      */
     protected fetchConfig(key: any, fallback?: any): any;
+    /**
+     * Gets the name of the storage token
+     *
+     * @returns {string}
+     */
     protected fetchStorageName(): string;
     /**
      *

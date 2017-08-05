@@ -29,6 +29,10 @@ var NgxRequest = (function () {
         this.params = resource;
         return this;
     };
+    NgxRequest.prototype.setHttpParams = function (params) {
+        this.params = params;
+        return this;
+    };
     NgxRequest.prototype.setReportProgress = function (value) {
         this.reportProgress = value;
         return this;

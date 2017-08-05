@@ -14,7 +14,7 @@
     "declaration": true,
     "skipLibCheck": true,
     "stripInternal": true,
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "noUnusedParameters": false,
     "isolatedModules": false,
     "lib": [
