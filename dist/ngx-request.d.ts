@@ -18,6 +18,7 @@ export declare class NgxRequest {
     setBody(body: any): this;
     setObserve(type: any): NgxRequest;
     setParams(params: any): NgxRequest;
+    setHttpParams(params: HttpParams): NgxRequest;
     setReportProgress(value: boolean): NgxRequest;
     setResponseType(type: any): NgxRequest;
     /**

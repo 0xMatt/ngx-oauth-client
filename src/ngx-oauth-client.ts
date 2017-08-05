@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {NgxOAuthConfig} from './config-interface';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {NgxRequest} from './ngx-request';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -9,7 +9,6 @@ import 'rxjs/observable/throw';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/operator/skip';
 import {NgxOAuthResponse} from './ngx-oauth-response';
-
 
 @Injectable()
 export abstract class NgxOAuthClient {
@@ -71,7 +70,7 @@ export abstract class NgxOAuthClient {
    * @param options
    * @returns {Observable<any>}
    */
-  get(endpoint: string, query?: any, options?: any): Observable<any> {
+  get (endpoint: string, query?: any, options?: any): Observable<any> {
     return this.request('GET', endpoint, query, options);
   }
 
@@ -210,6 +209,10 @@ export abstract class NgxOAuthClient {
       .setResponseType(this.fetchOption(options, 'responseType', 'json'))
       .setWithCredentials(this.fetchOption(options, 'withCredentials', false));
 
+    if (options && options.params instanceof HttpParams) {
+      request.setHttpParams(options.params);
+    }
+
     return this.http.request(method, this.buildEndpoint(endpoint), this.requestInterceptor(request))
       .map(res => this.responseInterceptor(request, res))
       .catch(err => this.errorInterceptor(request, err));
@@ -242,6 +245,11 @@ export abstract class NgxOAuthClient {
     return fallback;
   }
 
+  /**
+   * Gets the name of the storage token
+   *
+   * @returns {string}
+   */
   protected fetchStorageName(): string {
     const prefix: string = this.fetchConfig('storage_prefix');
     const suffix = 'auth_token';

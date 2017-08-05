@@ -4,8 +4,7 @@ import {NgxTestClient} from './ngx-testclient';
 import {NgxOAuthClient} from './ngx-oauth-client';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 import {NgxOAuthModule} from './ngx-oauth.module';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs/Observable';
+import {HttpClient, HttpParams} from '@angular/common/http';
 
 describe('NgxOAuthClient', () => {
   beforeEach(() => {
@@ -69,8 +68,17 @@ describe('NgxOAuthClient', () => {
 
   it('expects GET parameters to pass as HttpParams',
     inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
-      http.get('/api/users', {foo: 'bar'}).subscribe();
+      http.get('/api/users', {foo: 'bar'}).subscribe(data => expect(data).toEqual('foo=bar'));
       const req = httpMock.expectOne('http://127.0.0.1/api/users?foo=bar');
+      expect(req.request.method).toEqual('GET');
+      req.flush('foo=bar');
+      httpMock.verify();
+    }));
+
+  it('expects GET parameters to override payload passed in options',
+    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+      http.get('/api/users', {foo: 'bar'}, {params: new HttpParams().set('foo', 'baz')}).subscribe(data => expect(data).toEqual('foo=bar'));
+      const req = httpMock.expectOne('http://127.0.0.1/api/users?foo=baz');
       expect(req.request.method).toEqual('GET');
       req.flush('foo=bar');
       httpMock.verify();
@@ -83,6 +91,15 @@ describe('NgxOAuthClient', () => {
     req.flush({id: 1});
     httpMock.verify();
   }));
+
+  it('expects a POST request with params to append params to url',
+    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+      http.post('/api/users', {username: 'foo'}, {params: new HttpParams().set('foo', 'bar')}).subscribe(data => expect(data).toEqual({id: 1}));
+      const req = httpMock.expectOne('http://127.0.0.1/api/users?foo=bar');
+      expect(req.request.method).toEqual('POST');
+      req.flush({id: 1});
+      httpMock.verify();
+    }));
 
   it('expects a PUT request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
     http.put('/api/users/1', {username: 'foo'}).subscribe(data => expect(data).toEqual({id: 1}));
@@ -108,18 +125,19 @@ describe('NgxOAuthClient', () => {
     httpMock.verify();
   }));
 
-  it('should have errors intercepted', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
-    http.get('/api/users').subscribe(
-      data => {
-      },
-      err => expect(err instanceof TypeError).toEqual(true)
-    );
-    const req = httpMock.expectOne('http://127.0.0.1/api/users');
-    expect(req.request.method).toEqual('GET');
+  it('should have errors intercepted',
+    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+      http.get('/api/users').subscribe(
+        data => {
+        },
+        err => expect(err instanceof TypeError).toEqual(true)
+      );
+      const req = httpMock.expectOne('http://127.0.0.1/api/users');
+      expect(req.request.method).toEqual('GET');
 
-    req.flush({success: false}, {status: 400, statusText: 'Bad Request'});
-    httpMock.verify();
-  }));
+      req.flush({success: false}, {status: 400, statusText: 'Bad Request'});
+      httpMock.verify();
+    }));
 
   it('expects a options to override default values',
     inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {

@@ -1,4 +1,4 @@
-import {HttpHeaders, HttpParams, HttpRequest} from '@angular/common/http';
+import {HttpHeaders, HttpParams} from '@angular/common/http';
 
 export class NgxRequest {
 
@@ -45,6 +45,11 @@ export class NgxRequest {
       }
     }
     this.params = resource;
+    return this;
+  }
+
+  setHttpParams(params: HttpParams): NgxRequest {
+    this.params = params;
     return this;
   }
 

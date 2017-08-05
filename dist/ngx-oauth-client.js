@@ -177,6 +177,9 @@ var NgxOAuthClient = (function () {
             .setObserve(this.fetchOption(options, 'observe', 'body'))
             .setResponseType(this.fetchOption(options, 'responseType', 'json'))
             .setWithCredentials(this.fetchOption(options, 'withCredentials', false));
+        if (options && options.params instanceof http_1.HttpParams) {
+            request.setHttpParams(options.params);
+        }
         return this.http.request(method, this.buildEndpoint(endpoint), this.requestInterceptor(request))
             .map(function (res) { return _this.responseInterceptor(request, res); })
             .catch(function (err) { return _this.errorInterceptor(request, err); });
@@ -206,6 +209,11 @@ var NgxOAuthClient = (function () {
         }
         return fallback;
     };
+    /**
+     * Gets the name of the storage token
+     *
+     * @returns {string}
+     */
     NgxOAuthClient.prototype.fetchStorageName = function () {
         var prefix = this.fetchConfig('storage_prefix');
         var suffix = 'auth_token';
