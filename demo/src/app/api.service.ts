@@ -1,8 +1,8 @@
 import {Configuration, DefaultHeaders, NgxOAuthClient} from './component-symlink';
 import {environment} from '../environments/environment';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/observable/throw';
 import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/observable/throw';
 
 @Configuration(environment.api)
 @DefaultHeaders({

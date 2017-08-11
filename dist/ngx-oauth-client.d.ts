@@ -9,8 +9,6 @@ import 'rxjs/add/operator/skip';
 import { NgxOAuthResponse } from './ngx-oauth-response';
 export declare abstract class NgxOAuthClient {
     private http;
-    protected config: NgxOAuthConfig;
-    protected token: any;
     /**
      *
      * @param {HttpClient} http
@@ -94,6 +92,10 @@ export declare abstract class NgxOAuthClient {
      * @returns {any}
      */
     fetchToken(key?: string): any;
+    /**
+     *
+     */
+    clearToken(): void;
     /**
      * Performs an HTTP request
      *

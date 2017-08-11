@@ -95,7 +95,7 @@
 </ng-container>
 
 
-<div class="panel panel-default">
+<div class="panel panel-default" id="request-panel">
     <div class="panel-heading">
         <span class="pull-right">{{environment.api.host}}</span>
         Perform a Request
@@ -109,7 +109,7 @@
                             aria-haspopup="true" aria-expanded="false">{{request.method}} <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li *ngFor="let method of methods" (click)="selectMethod(method)"><a href="#">{{method}}</a>
+                        <li *ngFor="let method of methods" (click)="selectMethod(method)"><a href="#request-panel">{{method}}</a>
                         </li>
                     </ul>
                 </div><!-- /btn-group -->

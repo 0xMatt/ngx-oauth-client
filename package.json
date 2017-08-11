@@ -10,7 +10,7 @@
     "total-patch-publish": "run-s test demo.deploy version && npm version patch && npm publish && git push --tags && git push",
     "demo.serve": "ng serve",
     "demo.gh-pages": "gh-pages -d demo/dist",
-    "demo.build": "ng build -prod --aot",
+    "demo.build": "ng build -prod --aot --build-optimizer",
     "demo.copy-readme": "node scripts/copy-readme-to-demo.js",
     "demo.deploy": "run-s demo.build demo.copy-readme demo.gh-pages",
     "release.changelog": "conventional-changelog -i CHANGELOG.md -s -p angular",
@@ -43,7 +43,7 @@
     "@angular/core": "^4.3.1"
   },
   "devDependencies": {
-    "@angular/cli": "^1.2.5",
+    "@angular/cli": "^1.3.0",
     "@angular/common": "^4.3.1",
     "@angular/compiler": "^4.3.1",
     "@angular/compiler-cli": "^4.3.1",

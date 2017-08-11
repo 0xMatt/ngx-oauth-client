@@ -1,16 +1,18 @@
 import {inject, TestBed} from '@angular/core/testing';
 import {DEFAULT_CFG} from './default-config';
-import {NgxTestClient} from './ngx-testclient';
 import {NgxOAuthClient} from './ngx-oauth-client';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 import {NgxOAuthModule} from './ngx-oauth.module';
 import {HttpClient, HttpParams} from '@angular/common/http';
+import {NgxOAuthResponse} from './ngx-oauth-response';
+import {NgxTestClientOne} from './/ngx-test-client-one';
+import {NgxTestClientTwo} from './/ngx-test-client-two';
 
 describe('NgxOAuthClient', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [NgxOAuthModule, HttpClientTestingModule],
-      providers: [NgxTestClient]
+      providers: [NgxTestClientOne, NgxTestClientTwo]
     });
 
     let store = {};
@@ -34,40 +36,41 @@ describe('NgxOAuthClient', () => {
     httpMock.verify();
   }));
 
-  it('should be created via dependency injection', inject([NgxTestClient], (service: NgxTestClient) => {
+  it('should be created via dependency injection', inject([NgxTestClientOne], (service: NgxTestClientOne) => {
     expect(service instanceof NgxOAuthClient).toBe(true);
     expect(service.getClient() instanceof HttpClient).toBe(true);
   }));
 
-  it('should have default configuration', inject([NgxTestClient], (service: NgxTestClient) => {
+  it('should have default configuration', inject([NgxTestClientOne], (service: NgxTestClientOne) => {
     expect(typeof service.getConfig()).toBe(typeof {});
     expect(service.getConfig().host).toBe('http://127.0.0.1');
     expect(service.getConfig()).toBe(DEFAULT_CFG);
     expect(service.getDefaultHeaders()['Content-Type']).toBe('application/json');
   }));
 
-  it('should return the HTTPCleint when getClient() is called', inject([NgxTestClient], (service: NgxTestClient) => {
+  it('should return the HTTPCleint when getClient() is called', inject([NgxTestClientOne], (service: NgxTestClientOne) => {
     expect(service.getClient() instanceof HttpClient).toBe(true);
   }));
 
-  it('should throw an error if endpoint is empty', inject([NgxTestClient], (service: NgxTestClient) => {
+  it('should throw an error if endpoint is empty', inject([NgxTestClientOne], (service: NgxTestClientOne) => {
     expect(() => service.get('')).toThrow(new Error('Endpoint cannot be empty!'));
   }));
 
-  it('should throw an error if an invalid grant_type is specified', inject([NgxTestClient], (service: NgxTestClient) => {
+  it('should throw an error if an invalid grant_type is specified', inject([NgxTestClientOne], (service: NgxTestClientOne) => {
     expect(() => service.getToken('foo')).toThrow(new Error('Grant type foo is not supported'));
   }));
 
-  it('expects a GET request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
-    http.get('/api/users').subscribe(data => expect(data['username']).toEqual('foo'));
-    const req = httpMock.expectOne('http://127.0.0.1/api/users');
-    expect(req.request.method).toEqual('GET');
-    req.flush({username: 'foo'});
-    httpMock.verify();
-  }));
+  it('expects a GET request',
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
+      http.get('/api/users').subscribe(data => expect(data['username']).toEqual('foo'));
+      const req = httpMock.expectOne('http://127.0.0.1/api/users');
+      expect(req.request.method).toEqual('GET');
+      req.flush({username: 'foo'});
+      httpMock.verify();
+    }));
 
   it('expects GET parameters to pass as HttpParams',
-    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
       http.get('/api/users', {foo: 'bar'}).subscribe(data => expect(data).toEqual('foo=bar'));
       const req = httpMock.expectOne('http://127.0.0.1/api/users?foo=bar');
       expect(req.request.method).toEqual('GET');
@@ -76,7 +79,7 @@ describe('NgxOAuthClient', () => {
     }));
 
   it('expects GET parameters to override payload passed in options',
-    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
       http.get('/api/users', {foo: 'bar'}, {params: new HttpParams().set('foo', 'baz')}).subscribe(data => expect(data).toEqual('foo=bar'));
       const req = httpMock.expectOne('http://127.0.0.1/api/users?foo=baz');
       expect(req.request.method).toEqual('GET');
@@ -84,49 +87,55 @@ describe('NgxOAuthClient', () => {
       httpMock.verify();
     }));
 
-  it('expects a POST request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
-    http.post('/api/users', {username: 'foo'}).subscribe(data => expect(data).toEqual({id: 1}));
-    const req = httpMock.expectOne('http://127.0.0.1/api/users');
-    expect(req.request.method).toEqual('POST');
-    req.flush({id: 1});
-    httpMock.verify();
-  }));
+  it('expects a POST request',
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
+      http.post('/api/users', {username: 'foo'}).subscribe(data => expect(data).toEqual({id: 1}));
+      const req = httpMock.expectOne('http://127.0.0.1/api/users');
+      expect(req.request.method).toEqual('POST');
+      req.flush({id: 1});
+      httpMock.verify();
+    }));
 
   it('expects a POST request with params to append params to url',
-    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
-      http.post('/api/users', {username: 'foo'}, {params: new HttpParams().set('foo', 'bar')}).subscribe(data => expect(data).toEqual({id: 1}));
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
+      http.post('/api/users', {username: 'foo'}, {params: new HttpParams().set('foo', 'bar')}).subscribe(
+        data => expect(data).toEqual({id: 1})
+      );
       const req = httpMock.expectOne('http://127.0.0.1/api/users?foo=bar');
       expect(req.request.method).toEqual('POST');
       req.flush({id: 1});
       httpMock.verify();
     }));
 
-  it('expects a PUT request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
-    http.put('/api/users/1', {username: 'foo'}).subscribe(data => expect(data).toEqual({id: 1}));
-    const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
-    expect(req.request.method).toEqual('PUT');
-    req.flush({id: 1});
-    httpMock.verify();
-  }));
+  it('expects a PUT request',
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
+      http.put('/api/users/1', {username: 'foo'}).subscribe(data => expect(data).toEqual({id: 1}));
+      const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
+      expect(req.request.method).toEqual('PUT');
+      req.flush({id: 1});
+      httpMock.verify();
+    }));
 
-  it('expects a PATCH request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
-    http.patch('/api/users/1', {foo: 'bar'}).subscribe(data => expect(data).toEqual({foo: 'bar'}));
-    const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
-    expect(req.request.method).toEqual('PATCH');
-    req.flush({foo: 'bar'});
-    httpMock.verify();
-  }));
+  it('expects a PATCH request',
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
+      http.patch('/api/users/1', {foo: 'bar'}).subscribe(data => expect(data).toEqual({foo: 'bar'}));
+      const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
+      expect(req.request.method).toEqual('PATCH');
+      req.flush({foo: 'bar'});
+      httpMock.verify();
+    }));
 
-  it('expects a DELETE request', inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
-    http.delete('/api/users/1').subscribe(data => expect(data).toEqual({}));
-    const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
-    expect(req.request.method).toEqual('DELETE');
-    req.flush({});
-    httpMock.verify();
-  }));
+  it('expects a DELETE request',
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
+      http.delete('/api/users/1').subscribe(data => expect(data).toEqual({}));
+      const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
+      expect(req.request.method).toEqual('DELETE');
+      req.flush({});
+      httpMock.verify();
+    }));
 
   it('should have errors intercepted',
-    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
       http.get('/api/users').subscribe(
         data => {
         },
@@ -140,7 +149,7 @@ describe('NgxOAuthClient', () => {
     }));
 
   it('expects a options to override default values',
-    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
       http.get('/api/users/1', {}, {withCredentials: true}).subscribe(data => expect(data).toEqual({}));
       const req = httpMock.expectOne('http://127.0.0.1/api/users/1');
       expect(req.request.method).toEqual('GET');
@@ -149,8 +158,8 @@ describe('NgxOAuthClient', () => {
       httpMock.verify();
     }));
 
-  it('should provide specific token key if requested', inject([NgxTestClient], (http: NgxTestClient) => {
-    localStorage.setItem('client_auth_token', JSON.stringify({
+  it('should provide specific token key if requested', inject([NgxTestClientOne], (http: NgxTestClientOne) => {
+    localStorage.setItem('auth_token', JSON.stringify({
       access_token: '123'
     }));
 
@@ -158,26 +167,74 @@ describe('NgxOAuthClient', () => {
     expect(localStorage.getItem).toHaveBeenCalled();
   }));
 
-  it('should provide full token token object if no key is specified', inject([NgxTestClient], (http: NgxTestClient) => {
-    localStorage.setItem('client_auth_token', JSON.stringify({
+  it('should provide full token token object if no key is specified', inject([NgxTestClientOne], (http: NgxTestClientOne) => {
+    const response: NgxOAuthResponse = {
+      access_token: '123',
+      expires_in: 123,
+      token_type: 'bearer'
+    };
+    http.setToken(response);
+
+    expect(http.fetchToken()).toEqual(response);
+    expect(localStorage.getItem).toHaveBeenCalled();
+    expect(localStorage.getItem('auth_token')).toBeDefined();
+  }));
+
+  it('should return null if a token key is requested but not set', inject([NgxTestClientOne], (http: NgxTestClientOne) => {
+    localStorage.setItem('auth_token', JSON.stringify({
       access_token: '123'
     }));
 
-    expect(http.fetchToken()).toEqual({
-      access_token: '123'
-    });
+    expect(http.fetchToken('refresh_token')).toEqual(null);
     expect(localStorage.getItem).toHaveBeenCalled();
   }));
 
-  it('should return null if a token is requested but not set', inject([NgxTestClient], (http: NgxTestClient) => {
-
+  it('should return null if a full token is requested but not set', inject([NgxTestClientOne], (http: NgxTestClientOne) => {
     expect(http.fetchToken()).toEqual(null);
     expect(localStorage.getItem).toHaveBeenCalled();
   }));
 
+  it('should be able to clear existing tokens', inject([NgxTestClientOne], (http: NgxTestClientOne) => {
+    const response: NgxOAuthResponse = {
+      access_token: '123',
+      expires_in: 123,
+      token_type: 'bearer'
+    };
+    http.setToken(response);
+
+    expect(http.fetchToken()).toEqual(response);
+    expect(localStorage.getItem).toHaveBeenCalled();
+    http.clearToken();
+    expect(localStorage.removeItem).toHaveBeenCalled();
+    expect(http.fetchToken()).toBeNull();
+  }));
+
+  it('should set a token without a prefix if not defined', inject([NgxTestClientOne], (http: NgxTestClientOne) => {
+    const response: NgxOAuthResponse = {
+      access_token: '123',
+      expires_in: 123,
+      token_type: 'bearer'
+    };
+    http.setToken(response);
+    expect(localStorage.setItem).toHaveBeenCalled();
+    const storage: string = localStorage.getItem('auth_token') || '';
+    expect(JSON.parse(storage)).toEqual(response);
+  }));
+
+  it('should set a token without a prefix if defined', inject([NgxTestClientTwo], (http: NgxTestClientTwo) => {
+    const response: NgxOAuthResponse = {
+      access_token: '123',
+      expires_in: 123,
+      token_type: 'bearer'
+    };
+    http.setToken(response);
+    expect(localStorage.setItem).toHaveBeenCalled();
+    const storage: string = localStorage.getItem('two_auth_token') || '';
+    expect(JSON.parse(storage)).toEqual(response);
+  }));
 
   it('can authenticate with password credentials',
-    inject([NgxTestClient, HttpTestingController], (http: NgxTestClient, httpMock: HttpTestingController) => {
+    inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
       http.getToken().subscribe(data => expect(data).toEqual({
         access_token: '123',
         expires_in: 123

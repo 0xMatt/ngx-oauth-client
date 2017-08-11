@@ -149,9 +149,17 @@ var NgxOAuthClient = (function () {
             if (key && parsedToken.hasOwnProperty(key)) {
                 return parsedToken[key];
             }
-            return parsedToken;
+            else if (!key) {
+                return parsedToken;
+            }
         }
         return null;
+    };
+    /**
+     *
+     */
+    NgxOAuthClient.prototype.clearToken = function () {
+        localStorage.removeItem(this.fetchStorageName());
     };
     /**
      * Performs an HTTP request
@@ -192,6 +200,7 @@ var NgxOAuthClient = (function () {
      * @returns {any}
      */
     NgxOAuthClient.prototype.fetchOption = function (options, option, fallback) {
+        if (fallback === void 0) { fallback = null; }
         if (options && typeof options[option] !== 'undefined') {
             return options[option];
         }
@@ -204,6 +213,7 @@ var NgxOAuthClient = (function () {
      * @returns {any}
      */
     NgxOAuthClient.prototype.fetchConfig = function (key, fallback) {
+        if (fallback === void 0) { fallback = null; }
         if (typeof this.getConfig()[key] !== 'undefined') {
             return this.getConfig()[key];
         }

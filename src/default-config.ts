@@ -5,6 +5,5 @@ export const DEFAULT_CFG: NgxOAuthConfig = {
   token: 'oauth/token',
   key: 'my_key',
   secret: 'my_secret',
-  storage_prefix: 'client_'
 };
 

@@ -13,10 +13,6 @@ import {NgxOAuthResponse} from './ngx-oauth-response';
 @Injectable()
 export abstract class NgxOAuthClient {
 
-  protected config: NgxOAuthConfig;
-
-  protected token;
-
   /**
    *
    * @param {HttpClient} http
@@ -70,7 +66,7 @@ export abstract class NgxOAuthClient {
    * @param options
    * @returns {Observable<any>}
    */
-  get (endpoint: string, query?: any, options?: any): Observable<any> {
+  get(endpoint: string, query?: any, options?: any): Observable<any> {
     return this.request('GET', endpoint, query, options);
   }
 
@@ -176,11 +172,19 @@ export abstract class NgxOAuthClient {
       const parsedToken = JSON.parse(token);
       if (key && parsedToken.hasOwnProperty(key)) {
         return parsedToken[key];
+      } else if (!key) {
+        return parsedToken;
       }
-      return parsedToken;
     }
 
     return null;
+  }
+
+  /**
+   *
+   */
+  clearToken() {
+    localStorage.removeItem(this.fetchStorageName());
   }
 
   /**
@@ -225,7 +229,7 @@ export abstract class NgxOAuthClient {
    * @param fallback
    * @returns {any}
    */
-  protected fetchOption(options, option, fallback?) {
+  protected fetchOption(options, option, fallback: any = null) {
     if (options && typeof options[option] !== 'undefined') {
       return options[option];
     }
@@ -238,7 +242,7 @@ export abstract class NgxOAuthClient {
    * @param fallback
    * @returns {any}
    */
-  protected fetchConfig(key, fallback?) {
+  protected fetchConfig(key, fallback: any = null) {
     if (typeof this.getConfig()[key] !== 'undefined') {
       return this.getConfig()[key];
     }
