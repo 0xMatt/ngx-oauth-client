@@ -71,8 +71,8 @@ describe('NgxOAuthClient', () => {
 
   it('expects GET parameters to pass as HttpParams',
     inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
-      http.get('/api/users', {foo: 'bar'}).subscribe(data => expect(data).toEqual('foo=bar'));
-      const req = httpMock.expectOne('http://127.0.0.1/api/users?foo=bar');
+      http.get('/api/users', {foo: 'bar', bar: 'baz'}).subscribe(data => expect(data).toEqual('foo=bar'));
+      const req = httpMock.expectOne('http://127.0.0.1/api/users?foo=bar&bar=baz');
       expect(req.request.method).toEqual('GET');
       req.flush('foo=bar');
       httpMock.verify();
@@ -80,10 +80,10 @@ describe('NgxOAuthClient', () => {
 
   it('expects GET parameters to override payload passed in options',
     inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
-      http.get('/api/users', {foo: 'bar'}, {params: new HttpParams().set('foo', 'baz')}).subscribe(data => expect(data).toEqual('foo=bar'));
+      http.get('/api/users', {foo: 'bar'}, {params: new HttpParams().set('foo', 'baz')}).subscribe(data => expect(data).toEqual('foo=baz'));
       const req = httpMock.expectOne('http://127.0.0.1/api/users?foo=baz');
       expect(req.request.method).toEqual('GET');
-      req.flush('foo=bar');
+      req.flush('foo=baz');
       httpMock.verify();
     }));
 
