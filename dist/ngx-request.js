@@ -19,11 +19,10 @@ var NgxRequest = (function () {
         return this;
     };
     NgxRequest.prototype.setParams = function (params) {
-        var httpParams = new http_1.HttpParams();
-        var resource;
+        var resource = new http_1.HttpParams();
         for (var key in params) {
             if (typeof params === 'object' && params.hasOwnProperty(key)) {
-                resource = httpParams.set(key, params[key]);
+                resource = resource.set(key, params[key]);
             }
         }
         this.params = resource;
