@@ -8,7 +8,10 @@ import 'rxjs/add/observable/empty';
 import 'rxjs/add/operator/skip';
 import { NgxOAuthResponse } from './ngx-oauth-response';
 export declare abstract class NgxOAuthClient {
-    private http;
+    /**
+     * @param {HttpClient} http
+     */
+    protected http: HttpClient;
     /**
      *
      * @param {HttpClient} http
