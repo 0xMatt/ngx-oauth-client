@@ -14,10 +14,16 @@ import {NgxOAuthResponse} from './ngx-oauth-response';
 export abstract class NgxOAuthClient {
 
   /**
+   * @param {HttpClient} http
+   */
+  protected http: HttpClient;
+
+  /**
    *
    * @param {HttpClient} http
    */
-  constructor(private http: HttpClient) {
+  constructor(http: HttpClient) {
+    this.http = http;
   }
 
   getConfig(): any {
