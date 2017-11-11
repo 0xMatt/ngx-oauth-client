@@ -10,7 +10,7 @@ import 'rxjs/add/observable/throw';
   'Accept': 'application/json'
 })
 export class ApiService extends NgxOAuthClient {
-
+2
   /**
    *
    * @param {NgxRequest} request

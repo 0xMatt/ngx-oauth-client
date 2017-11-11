@@ -23,20 +23,20 @@ var NgxTestClientTwo = (function (_super) {
     function NgxTestClientTwo() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    NgxTestClientTwo.decorators = [
+        { type: core_1.Injectable },
+    ];
+    /** @nocollapse */
+    NgxTestClientTwo.ctorParameters = function () { return []; };
+    NgxTestClientTwo = __decorate([
+        ngx_oauth_client_1.Configuration({
+            host: 'http://127.0.0.1',
+            token: 'oauth/token',
+            key: 'my_key',
+            storage_prefix: 'two_'
+        })
+    ], NgxTestClientTwo);
     return NgxTestClientTwo;
 }(ngx_oauth_client_1.NgxOAuthClient));
-NgxTestClientTwo.decorators = [
-    { type: core_1.Injectable },
-];
-/** @nocollapse */
-NgxTestClientTwo.ctorParameters = function () { return []; };
-NgxTestClientTwo = __decorate([
-    ngx_oauth_client_1.Configuration({
-        host: 'http://127.0.0.1',
-        token: 'oauth/token',
-        key: 'my_key',
-        storage_prefix: 'two_'
-    })
-], NgxTestClientTwo);
 exports.NgxTestClientTwo = NgxTestClientTwo;
 //# sourceMappingURL=ngx-test-client-two.js.map
