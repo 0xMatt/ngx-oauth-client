@@ -5,8 +5,8 @@ import {HttpClientTestingModule, HttpTestingController} from '@angular/common/ht
 import {NgxOAuthModule} from './ngx-oauth.module';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {NgxOAuthResponse} from './ngx-oauth-response';
-import {NgxTestClientOne} from './/ngx-test-client-one';
-import {NgxTestClientTwo} from './/ngx-test-client-two';
+import {NgxTestClientOne} from './ngx-test-client-one';
+import {NgxTestClientTwo} from './ngx-test-client-two';
 
 describe('NgxOAuthClient', () => {
   beforeEach(() => {
@@ -235,7 +235,7 @@ describe('NgxOAuthClient', () => {
 
   it('can authenticate with password credentials',
     inject([NgxTestClientOne, HttpTestingController], (http: NgxTestClientOne, httpMock: HttpTestingController) => {
-      http.getToken().subscribe(data => expect(data).toEqual({
+      http.getToken().subscribe(data => expect(data).toEqual(<NgxOAuthResponse>{
         access_token: '123',
         expires_in: 123
       }));
