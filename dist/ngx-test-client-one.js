@@ -19,23 +19,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ngx_oauth_client_1 = require("./ngx-oauth-client");
 var core_1 = require("@angular/core");
 var default_config_1 = require("./default-config");
-var NgxTestClientOne = (function (_super) {
+var NgxTestClientOne = /** @class */ (function (_super) {
     __extends(NgxTestClientOne, _super);
     function NgxTestClientOne() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    NgxTestClientOne.decorators = [
+        { type: core_1.Injectable },
+    ];
+    /** @nocollapse */
+    NgxTestClientOne.ctorParameters = function () { return []; };
+    NgxTestClientOne = __decorate([
+        ngx_oauth_client_1.Configuration(default_config_1.DEFAULT_CFG),
+        ngx_oauth_client_1.DefaultHeaders({
+            'Content-Type': 'application/json'
+        })
+    ], NgxTestClientOne);
     return NgxTestClientOne;
 }(ngx_oauth_client_1.NgxOAuthClient));
-NgxTestClientOne.decorators = [
-    { type: core_1.Injectable },
-];
-/** @nocollapse */
-NgxTestClientOne.ctorParameters = function () { return []; };
-NgxTestClientOne = __decorate([
-    ngx_oauth_client_1.Configuration(default_config_1.DEFAULT_CFG),
-    ngx_oauth_client_1.DefaultHeaders({
-        'Content-Type': 'application/json'
-    })
-], NgxTestClientOne);
 exports.NgxTestClientOne = NgxTestClientOne;
 //# sourceMappingURL=ngx-test-client-one.js.map
