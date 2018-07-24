@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
+import { throwError } from 'rxjs/internal/observable/throwError';
 import { catchError, map } from 'rxjs/operators';
 import { NgxOAuthConfig } from './config-interface';
 import { NgxOAuthResponse } from './ngx-oauth-response';
@@ -53,9 +54,8 @@ export abstract class NgxOAuthClient {
    * @param error
    * @returns {any}
    */
-  errorInterceptor(request, error) {
-    console.log('eeee', error);
-    return error;
+  errorInterceptor(request, error): Observable<TypeError> {
+    return throwError(new TypeError(error));
   }
 
   getClient(): HttpClient {

@@ -33,7 +33,7 @@ export declare abstract class NgxOAuthClient {
      * @param error
      * @returns {any}
      */
-    errorInterceptor(request: any, error: any): any;
+    errorInterceptor(request: any, error: any): Observable<TypeError>;
     getClient(): HttpClient;
     /**
      *

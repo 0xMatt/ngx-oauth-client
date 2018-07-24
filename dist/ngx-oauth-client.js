@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var http_1 = require("@angular/common/http");
 var core_1 = require("@angular/core");
+var throwError_1 = require("rxjs/internal/observable/throwError");
 var operators_1 = require("rxjs/operators");
 var ngx_request_1 = require("./ngx-request");
 var NgxOAuthClient = /** @class */ (function () {
@@ -40,8 +41,7 @@ var NgxOAuthClient = /** @class */ (function () {
      * @returns {any}
      */
     NgxOAuthClient.prototype.errorInterceptor = function (request, error) {
-        console.log('eeee', error);
-        return error;
+        return throwError_1.throwError(new TypeError(error));
     };
     NgxOAuthClient.prototype.getClient = function () {
         return this.http;
