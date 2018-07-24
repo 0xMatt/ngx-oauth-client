@@ -1,3 +1,8 @@
+<a name="0.2.7"></a>
+## [0.2.7](https://github.com/0xMatt/ngx-oauth-client/compare/v0.2.5...v0.2.7) (2018-07-24)
+
+
+
 <a name="0.2.5"></a>
 ## [0.2.5](https://github.com/0xMatt/ngx-oauth-client/compare/v0.2.4...v0.2.5) (2017-08-21)
 
