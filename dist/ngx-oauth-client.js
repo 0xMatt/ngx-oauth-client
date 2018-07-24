@@ -1,14 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var core_1 = require("@angular/core");
 var http_1 = require("@angular/common/http");
+var core_1 = require("@angular/core");
+var operators_1 = require("rxjs/operators");
 var ngx_request_1 = require("./ngx-request");
-require("rxjs/add/operator/map");
-require("rxjs/add/operator/catch");
-require("rxjs/observable/throw");
-require("rxjs/add/observable/empty");
-require("rxjs/add/operator/skip");
-var NgxOAuthClient = (function () {
+var NgxOAuthClient = /** @class */ (function () {
     /**
      *
      * @param {HttpClient} http
@@ -25,17 +21,7 @@ var NgxOAuthClient = (function () {
      * @param request
      * @returns {any}
      */
-    /**
-       *
-       * @param request
-       * @returns {any}
-       */
-    NgxOAuthClient.prototype.requestInterceptor = /**
-       *
-       * @param request
-       * @returns {any}
-       */
-    function (request) {
+    NgxOAuthClient.prototype.requestInterceptor = function (request) {
         return request;
     };
     /**
@@ -44,19 +30,7 @@ var NgxOAuthClient = (function () {
      * @param response
      * @returns {any}
      */
-    /**
-       *
-       * @param request
-       * @param response
-       * @returns {any}
-       */
-    NgxOAuthClient.prototype.responseInterceptor = /**
-       *
-       * @param request
-       * @param response
-       * @returns {any}
-       */
-    function (request, response) {
+    NgxOAuthClient.prototype.responseInterceptor = function (request, response) {
         return response;
     };
     /**
@@ -65,19 +39,8 @@ var NgxOAuthClient = (function () {
      * @param error
      * @returns {any}
      */
-    /**
-       *
-       * @param request
-       * @param error
-       * @returns {any}
-       */
-    NgxOAuthClient.prototype.errorInterceptor = /**
-       *
-       * @param request
-       * @param error
-       * @returns {any}
-       */
-    function (request, error) {
+    NgxOAuthClient.prototype.errorInterceptor = function (request, error) {
+        console.log('eeee', error);
         return error;
     };
     NgxOAuthClient.prototype.getClient = function () {
@@ -90,21 +53,7 @@ var NgxOAuthClient = (function () {
      * @param options
      * @returns {Observable<any>}
      */
-    /**
-       *
-       * @param endpoint
-       * @param query
-       * @param options
-       * @returns {Observable<any>}
-       */
-    NgxOAuthClient.prototype.get = /**
-       *
-       * @param endpoint
-       * @param query
-       * @param options
-       * @returns {Observable<any>}
-       */
-    function (endpoint, query, options) {
+    NgxOAuthClient.prototype.get = function (endpoint, query, options) {
         return this.request('GET', endpoint, query, options);
     };
     /**
@@ -114,21 +63,7 @@ var NgxOAuthClient = (function () {
      * @param options
      * @returns {Observable<any>}
      */
-    /**
-       *
-       * @param endpoint
-       * @param data
-       * @param options
-       * @returns {Observable<any>}
-       */
-    NgxOAuthClient.prototype.post = /**
-       *
-       * @param endpoint
-       * @param data
-       * @param options
-       * @returns {Observable<any>}
-       */
-    function (endpoint, data, options) {
+    NgxOAuthClient.prototype.post = function (endpoint, data, options) {
         return this.request('POST', endpoint, data, options);
     };
     /**
@@ -138,21 +73,7 @@ var NgxOAuthClient = (function () {
      * @param options
      * @returns {Observable<any>}
      */
-    /**
-       *
-       * @param endpoint
-       * @param data
-       * @param options
-       * @returns {Observable<any>}
-       */
-    NgxOAuthClient.prototype.put = /**
-       *
-       * @param endpoint
-       * @param data
-       * @param options
-       * @returns {Observable<any>}
-       */
-    function (endpoint, data, options) {
+    NgxOAuthClient.prototype.put = function (endpoint, data, options) {
         return this.request('PUT', endpoint, data, options);
     };
     /**
@@ -162,21 +83,7 @@ var NgxOAuthClient = (function () {
      * @param options
      * @returns {Observable<any>}
      */
-    /**
-       *
-       * @param endpoint
-       * @param data
-       * @param options
-       * @returns {Observable<any>}
-       */
-    NgxOAuthClient.prototype.patch = /**
-       *
-       * @param endpoint
-       * @param data
-       * @param options
-       * @returns {Observable<any>}
-       */
-    function (endpoint, data, options) {
+    NgxOAuthClient.prototype.patch = function (endpoint, data, options) {
         return this.request('PATCH', endpoint, data, options);
     };
     /**
@@ -186,21 +93,7 @@ var NgxOAuthClient = (function () {
      * @param options
      * @returns {Observable<any>}
      */
-    /**
-       *
-       * @param endpoint
-       * @param data
-       * @param options
-       * @returns {Observable<any>}
-       */
-    NgxOAuthClient.prototype.delete = /**
-       *
-       * @param endpoint
-       * @param data
-       * @param options
-       * @returns {Observable<any>}
-       */
-    function (endpoint, options) {
+    NgxOAuthClient.prototype.delete = function (endpoint, options) {
         return this.request('delete', endpoint, {}, options);
     };
     /**
@@ -210,23 +103,12 @@ var NgxOAuthClient = (function () {
      * @param grant_type
      * @returns {Observable<any>}
      */
-    /**
-       * Uses formtype to comply with the OAuth2.0 Spec, this will not change
-       *
-       * @param data
-       * @param grant_type
-       * @returns {Observable<any>}
-       */
-    NgxOAuthClient.prototype.getToken = /**
-       * Uses formtype to comply with the OAuth2.0 Spec, this will not change
-       *
-       * @param data
-       * @param grant_type
-       * @returns {Observable<any>}
-       */
-    function (grant_type, data) {
+    NgxOAuthClient.prototype.getToken = function (grant_type, data) {
         var _this = this;
-        if (grant_type && ['client_credentials', 'authorization_code', 'password', 'refresh_token'].indexOf(grant_type) === -1) {
+        if (grant_type && ['client_credentials',
+            'authorization_code',
+            'password',
+            'refresh_token'].indexOf(grant_type) === -1) {
             throw new Error("Grant type " + grant_type + " is not supported");
         }
         var config = this.getConfig();
@@ -247,10 +129,11 @@ var NgxOAuthClient = (function () {
             }
         }
         var headers = new http_1.HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
-        return this.http.post(config.host + '/' + config.token, params.join('&'), { headers: headers }).map(function (res) {
+        return this.http.post(config.host + '/' + config.token, params.join('&'), { headers: headers })
+            .pipe(operators_1.map(function (res) {
             _this.setToken(res);
             return res;
-        });
+        }));
     };
     NgxOAuthClient.prototype.setToken = function (token) {
         localStorage.setItem(this.fetchStorageName(), JSON.stringify(token));
@@ -260,17 +143,7 @@ var NgxOAuthClient = (function () {
      * @param {string} key
      * @returns {any}
      */
-    /**
-       *
-       * @param {string} key
-       * @returns {any}
-       */
-    NgxOAuthClient.prototype.fetchToken = /**
-       *
-       * @param {string} key
-       * @returns {any}
-       */
-    function (key) {
+    NgxOAuthClient.prototype.fetchToken = function (key) {
         var token = localStorage.getItem(this.fetchStorageName());
         if (token) {
             var parsedToken = JSON.parse(token);
@@ -286,13 +159,7 @@ var NgxOAuthClient = (function () {
     /**
      *
      */
-    /**
-       *
-       */
-    NgxOAuthClient.prototype.clearToken = /**
-       *
-       */
-    function () {
+    NgxOAuthClient.prototype.clearToken = function () {
         localStorage.removeItem(this.fetchStorageName());
     };
     /**
@@ -304,31 +171,15 @@ var NgxOAuthClient = (function () {
      * @param options
      * @returns {Observable<any>}
      */
-    /**
-       * Performs an HTTP request
-       *
-       * @param {string} method
-       * @param {string} endpoint
-       * @param payload
-       * @param options
-       * @returns {Observable<any>}
-       */
-    NgxOAuthClient.prototype.request = /**
-       * Performs an HTTP request
-       *
-       * @param {string} method
-       * @param {string} endpoint
-       * @param payload
-       * @param options
-       * @returns {Observable<any>}
-       */
-    function (method, endpoint, payload, options) {
+    NgxOAuthClient.prototype.request = function (method, endpoint, payload, options) {
         var _this = this;
         var request = new ngx_request_1.NgxRequest(method, this.buildEndpoint(endpoint));
         if (method === 'GET' && payload && Object.keys(payload).length > 0) {
             request.setParams(payload);
         }
-        if (['POST', 'PUT', 'PATCH'].indexOf(method) !== -1) {
+        if (['POST',
+            'PUT',
+            'PATCH'].indexOf(method) !== -1) {
             request.setBody(payload);
         }
         request
@@ -341,8 +192,7 @@ var NgxOAuthClient = (function () {
             request.setHttpParams(options.params);
         }
         return this.http.request(method, this.buildEndpoint(endpoint), this.requestInterceptor(request))
-            .map(function (res) { return _this.responseInterceptor(request, res); })
-            .catch(function (err) { return _this.errorInterceptor(request, err); });
+            .pipe(operators_1.map(function (res) { return _this.responseInterceptor(request, res); }), operators_1.catchError(function (err) { return _this.errorInterceptor(request, err); }));
     };
     /**
      * Fetch options and fallback to config defaults
@@ -351,21 +201,7 @@ var NgxOAuthClient = (function () {
      * @param fallback
      * @returns {any}
      */
-    /**
-       * Fetch options and fallback to config defaults
-       * @param options
-       * @param option
-       * @param fallback
-       * @returns {any}
-       */
-    NgxOAuthClient.prototype.fetchOption = /**
-       * Fetch options and fallback to config defaults
-       * @param options
-       * @param option
-       * @param fallback
-       * @returns {any}
-       */
-    function (options, option, fallback) {
+    NgxOAuthClient.prototype.fetchOption = function (options, option, fallback) {
         if (fallback === void 0) { fallback = null; }
         if (options && typeof options[option] !== 'undefined') {
             return options[option];
@@ -378,19 +214,7 @@ var NgxOAuthClient = (function () {
      * @param fallback
      * @returns {any}
      */
-    /**
-       *
-       * @param key
-       * @param fallback
-       * @returns {any}
-       */
-    NgxOAuthClient.prototype.fetchConfig = /**
-       *
-       * @param key
-       * @param fallback
-       * @returns {any}
-       */
-    function (key, fallback) {
+    NgxOAuthClient.prototype.fetchConfig = function (key, fallback) {
         if (fallback === void 0) { fallback = null; }
         if (typeof this.getConfig()[key] !== 'undefined') {
             return this.getConfig()[key];
@@ -402,17 +226,7 @@ var NgxOAuthClient = (function () {
      *
      * @returns {string}
      */
-    /**
-       * Gets the name of the storage token
-       *
-       * @returns {string}
-       */
-    NgxOAuthClient.prototype.fetchStorageName = /**
-       * Gets the name of the storage token
-       *
-       * @returns {string}
-       */
-    function () {
+    NgxOAuthClient.prototype.fetchStorageName = function () {
         var prefix = this.fetchConfig('storage_prefix');
         var suffix = 'auth_token';
         var token = '';
@@ -427,17 +241,7 @@ var NgxOAuthClient = (function () {
      * @param endpoint
      * @returns {string}
      */
-    /**
-       *
-       * @param endpoint
-       * @returns {string}
-       */
-    NgxOAuthClient.prototype.buildEndpoint = /**
-       *
-       * @param endpoint
-       * @returns {string}
-       */
-    function (endpoint) {
+    NgxOAuthClient.prototype.buildEndpoint = function (endpoint) {
         if (!endpoint) {
             throw new Error('Endpoint cannot be empty!');
         }
@@ -451,7 +255,7 @@ var NgxOAuthClient = (function () {
     ];
     /** @nocollapse */
     NgxOAuthClient.ctorParameters = function () { return [
-        { type: http_1.HttpClient, },
+        { type: http_1.HttpClient }
     ]; };
     return NgxOAuthClient;
 }());

@@ -54,6 +54,7 @@ export abstract class NgxOAuthClient {
    * @returns {any}
    */
   errorInterceptor(request, error) {
+    console.log('eeee', error);
     return error;
   }
 

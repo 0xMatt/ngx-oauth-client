@@ -18,7 +18,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 var ngx_oauth_client_1 = require("./ngx-oauth-client");
 var core_1 = require("@angular/core");
-var NgxTestClientTwo = (function (_super) {
+var NgxTestClientTwo = /** @class */ (function (_super) {
     __extends(NgxTestClientTwo, _super);
     function NgxTestClientTwo() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -26,8 +26,6 @@ var NgxTestClientTwo = (function (_super) {
     NgxTestClientTwo.decorators = [
         { type: core_1.Injectable },
     ];
-    /** @nocollapse */
-    NgxTestClientTwo.ctorParameters = function () { return []; };
     NgxTestClientTwo = __decorate([
         ngx_oauth_client_1.Configuration({
             host: 'http://127.0.0.1',

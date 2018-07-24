@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var http_1 = require("@angular/common/http");
-var NgxRequest = (function () {
+var NgxRequest = /** @class */ (function () {
     function NgxRequest(method, url) {
         this.method = method;
         this.url = url;
@@ -45,17 +45,7 @@ var NgxRequest = (function () {
      * @param {boolean} value
      * @returns {NgxRequest}
      */
-    /**
-       *
-       * @param {boolean} value
-       * @returns {NgxRequest}
-       */
-    NgxRequest.prototype.setWithCredentials = /**
-       *
-       * @param {boolean} value
-       * @returns {NgxRequest}
-       */
-    function (value) {
+    NgxRequest.prototype.setWithCredentials = function (value) {
         this.withCredentials = value;
         return this;
     };
