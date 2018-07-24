@@ -1,14 +1,10 @@
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {NgxOAuthConfig} from './config-interface';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {NgxRequest} from './ngx-request';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
-import 'rxjs/observable/throw';
-import 'rxjs/add/observable/empty';
-import 'rxjs/add/operator/skip';
-import {NgxOAuthResponse} from './ngx-oauth-response';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/internal/Observable';
+import { catchError, map } from 'rxjs/operators';
+import { NgxOAuthConfig } from './config-interface';
+import { NgxOAuthResponse } from './ngx-oauth-response';
+import { NgxRequest } from './ngx-request';
 
 @Injectable()
 export abstract class NgxOAuthClient {
@@ -129,7 +125,10 @@ export abstract class NgxOAuthClient {
    */
   public getToken(grant_type?: string, data?: any): Observable<NgxOAuthResponse> {
 
-    if (grant_type && ['client_credentials', 'authorization_code', 'password', 'refresh_token'].indexOf(grant_type) === -1) {
+    if (grant_type && [ 'client_credentials',
+                        'authorization_code',
+                        'password',
+                        'refresh_token' ].indexOf(grant_type) === -1) {
       throw new Error(`Grant type ${grant_type} is not supported`);
     }
 
@@ -150,16 +149,19 @@ export abstract class NgxOAuthClient {
     const params: string[] = [];
     for (const key in payload) {
       if (payload.hasOwnProperty(key)) {
-        params.push(`${key}=${payload[key]}`);
+        params.push(`${key}=${payload[ key ]}`);
       }
     }
 
-    const headers = new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'});
+    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
-    return this.http.post(config.host + '/' + config.token, params.join('&'), {headers}).map((res: NgxOAuthResponse) => {
-      this.setToken(res);
-      return res;
-    });
+    return this.http.post(config.host + '/' + config.token, params.join('&'), { headers })
+      .pipe(
+        map((res: NgxOAuthResponse) => {
+          this.setToken(res);
+          return res;
+        })
+      );
   }
 
   setToken(token: NgxOAuthResponse) {
@@ -177,7 +179,7 @@ export abstract class NgxOAuthClient {
     if (token) {
       const parsedToken = JSON.parse(token);
       if (key && parsedToken.hasOwnProperty(key)) {
-        return parsedToken[key];
+        return parsedToken[ key ];
       } else if (!key) {
         return parsedToken;
       }
@@ -208,7 +210,9 @@ export abstract class NgxOAuthClient {
       request.setParams(payload);
     }
 
-    if (['POST', 'PUT', 'PATCH'].indexOf(method) !== -1) {
+    if ([ 'POST',
+          'PUT',
+          'PATCH' ].indexOf(method) !== -1) {
       request.setBody(payload);
     }
 
@@ -224,8 +228,10 @@ export abstract class NgxOAuthClient {
     }
 
     return this.http.request(method, this.buildEndpoint(endpoint), this.requestInterceptor(request))
-      .map(res => this.responseInterceptor(request, res))
-      .catch(err => this.errorInterceptor(request, err));
+      .pipe(
+        map(res => this.responseInterceptor(request, res)),
+        catchError(err => this.errorInterceptor(request, err))
+      );
   }
 
   /**
@@ -236,8 +242,8 @@ export abstract class NgxOAuthClient {
    * @returns {any}
    */
   protected fetchOption(options, option, fallback: any = null) {
-    if (options && typeof options[option] !== 'undefined') {
-      return options[option];
+    if (options && typeof options[ option ] !== 'undefined') {
+      return options[ option ];
     }
     return this.fetchConfig(option, fallback);
   }
@@ -249,8 +255,8 @@ export abstract class NgxOAuthClient {
    * @returns {any}
    */
   protected fetchConfig(key, fallback: any = null) {
-    if (typeof this.getConfig()[key] !== 'undefined') {
-      return this.getConfig()[key];
+    if (typeof this.getConfig()[ key ] !== 'undefined') {
+      return this.getConfig()[ key ];
     }
     return fallback;
   }

@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
+import { Observable } from 'rxjs/internal/Observable';
 import {ApiService} from './api.service';
 import {environment} from '../environments/environment';
 import {HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {Observable} from 'rxjs/Observable';
 
 @Component({
   selector: 'app-root',
