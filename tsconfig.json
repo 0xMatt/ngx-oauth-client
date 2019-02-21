@@ -17,6 +17,14 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ngx-oauth-client": [
+        "dist/ngx-oauth-client"
+      ],
+      "ngx-oauth-client/*": [
+        "dist/ngx-oauth-client/*"
+      ]
+    }
   }
 }
